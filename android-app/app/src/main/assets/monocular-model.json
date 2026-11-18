@@ -1,0 +1,20 @@
+{
+  "sourceRepository": "depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf",
+  "sourceRevision": "8078d68a9c75a972131914f6afd0c1723be0da7f",
+  "depthKind": "MONOCULAR_METRIC_ESTIMATE",
+  "maximumDepthMeters": 20,
+  "inputSize": 280,
+  "inputName": "pixel_values",
+  "quantization": "DYNAMIC_INT8_LINEAR_FP32_CONV_ATTENTION_HEAD",
+  "resizeMethod": "OPENCV_CUBIC",
+  "imageTransform": "center square; OpenCV cubic 280x280; RGB ImageNet CHW",
+  "file": "depth_280_w8.onnx",
+  "assetName": "monocular_depth.onnx",
+  "bytes": 35597675,
+  "sha256": "d1ec95ab42bdc6173b1a9db06e7488df38290613d9cbb453520b219bf96b3ae0",
+  "float32ExportMaxAbsErrorMeters": 1.0728836059570312e-05,
+  "isGroundTruthValidated": false,
+  "selectedRuntime": "CPU",
+  "selectedThreads": 3,
+  "spinning": false
+}

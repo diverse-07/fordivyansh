@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.NetraSaathi.Base" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#000000</item>
+    </style>
+    <style name="Theme.NetraSaathi" parent="Theme.NetraSaathi.Base"/>
+</resources>

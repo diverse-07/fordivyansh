@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-labelledby="title" color="#111111">
+  <title id="title">LibreVision</title>
+  <path fill="currentColor" stroke="none" d="M4 10H7V23H14V26H4Z"/>
+  <path fill="currentColor" stroke="none" d="M12 6H15.4L21 21.4L26.6 6H30L22.6 26H19.4Z"/>
+  <circle fill="currentColor" stroke="none" cx="5.5" cy="5.5" r="1.75"/>
+</svg>

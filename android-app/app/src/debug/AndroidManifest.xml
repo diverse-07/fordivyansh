@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:networkSecurityConfig="@xml/development_network_security"/>
+    <instrumentation android:name="com.librevision.NavigationSmokeInstrumentation" android:targetPackage="com.librevision" android:label="Navigation and native depth smoke checks"/>
+    <instrumentation android:name="com.librevision.VisionPerformanceInstrumentation" android:targetPackage="com.librevision" android:label="Synthetic parallel model benchmark"/>
+    <instrumentation android:name="com.librevision.GlobalMuseSmokeInstrumentation" android:targetPackage="com.librevision" android:label="Global Muse transcript and app action checks"/>
+    <instrumentation android:name="com.librevision.DesignSmokeInstrumentation" android:targetPackage="com.librevision" android:label="Native design and camera regression checks"/>
+    <instrumentation android:name="com.librevision.NavigationUxInstrumentation" android:targetPackage="com.librevision" android:label="Navigation camera, warning layout and native speech checks"/>
+    <instrumentation android:name="com.librevision.ClearGuidanceInstrumentation" android:targetPackage="com.librevision" android:label="Uninterrupted alerts and real Muse conversation checks"/>
+    <instrumentation android:name="com.librevision.UiReviewInstrumentation" android:targetPackage="com.librevision" android:label="Visual scenario and extreme font review"/>
+    <instrumentation android:name="com.librevision.LocationStartupInstrumentation" android:targetPackage="com.librevision" android:label="Location startup and planned maneuver check"/>
+    <instrumentation android:name="com.librevision.SurroundingsInstrumentation" android:targetPackage="com.librevision" android:label="Surroundings camera sensor cues and selected-image chat checks"/>
+    <instrumentation android:name="com.librevision.WelcomeInstrumentation" android:targetPackage="com.librevision" android:label="Welcome setup and spoken tour checks"/>
+</manifest>

@@ -1,0 +1,7 @@
+{
+  "url": "https://huggingface.co/runanywhere/silero-vad-v5/resolve/38a8e93669ea8fd4dd5d693bc90d86b7b667d36d/silero_vad.onnx",
+  "repository": "runanywhere/silero-vad-v5",
+  "revision": "38a8e93669ea8fd4dd5d693bc90d86b7b667d36d",
+  "bytes": 2327524,
+  "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3"
+}

@@ -1,0 +1,3264 @@
+<!doctype html>
+<html lang="en" data-finish="field" data-type="standard">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#e5e5df" />
+    <title>LibreVision — Interface Study 01</title>
+    <link rel="icon" href="brand/librevision-icon.svg" type="image/svg+xml" />
+    <style>
+      /* EDIT HERE: Field finish. All icons and illustrations live in this file. */
+      :root {
+        color-scheme: light;
+        --shell: #e5e5df;
+        --panel: #f2f2eb;
+        --key: #d5d7cf;
+        --key-top: #e4e5de;
+        --ink: #202621;
+        --secondary: #50584f;
+        --line: #b8bcb1;
+        --accent: #f16c45;
+        --on-accent: #20251f;
+        --well: #2a312c;
+        --on-well: #f3f4eb;
+        --safe: #b0d7a6;
+        --on-safe: #18361d;
+        --danger: #ee947f;
+        --on-danger: #481c12;
+        --muted-key: #c1c5bb;
+        --focus: #116048;
+        --type-scale: 1;
+        --scene-key: #b6a8ff;
+        --on-scene: #24183d;
+        --studio-bg: #d3d5cd;
+        --studio-ink: #343c32;
+        --studio-muted: #596451;
+        --studio-line: #a9afa1;
+        --studio-selected: #262e25;
+        --on-studio-selected: #f1f3e9;
+        --review-selected: #fafbf4;
+        --on-review-selected: #343c32;
+        --radius: 8px;
+        --gap: 12px;
+        --control-text: calc(21px * var(--type-scale));
+        --key-shadow:
+          inset 0 1px 0 #ffffff75, 0 3px 0 #a5aa9d, 0 5px 8px #1a21100b;
+        --sans: Arial, Helvetica, system-ui, sans-serif;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      }
+      /* EDIT HERE: Pitch-black Night finish with neon-green feature controls. */
+      :root[data-finish="night"] {
+        color-scheme: dark;
+        --shell: #000000;
+        --panel: #111111;
+        --key: #1b1b1b;
+        --key-top: #242424;
+        --ink: #f4f7fc;
+        --secondary: #aab8ce;
+        --line: #52627c;
+        --accent: #ff927f;
+        --on-accent: #151c29;
+        --well: #111111;
+        --on-well: #f4f7fc;
+        --safe: #5ce1c6;
+        --on-safe: #092e26;
+        --danger: #ff927f;
+        --on-danger: #421b13;
+        --muted-key: #536278;
+        --focus: #e4eaa1;
+        --neon: #b6ff42;
+        --on-neon: #172400;
+        --studio-bg: #000000;
+        --studio-ink: #f4f7fc;
+        --studio-muted: #aab8ce;
+        --studio-line: #52627c;
+        --studio-selected: #b6ff42;
+        --on-studio-selected: #172400;
+        --review-selected: #b6ff42;
+        --on-review-selected: #172400;
+        --key-shadow: inset 0 1px 0 #ffffff16, 0 3px 0 #080808, 0 5px 8px #0002;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      body {
+        margin: 0;
+        background: var(--studio-bg);
+        color: var(--studio-ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.48;
+        box-shadow: none;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      a:focus-visible,
+      summary:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 4px;
+      }
+      button:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: none;
+      }
+      svg {
+        display: block;
+      }
+      .sprite {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      }
+      .icon {
+        width: 32px;
+        height: 32px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.3;
+        stroke-linecap: square;
+        stroke-linejoin: round;
+        flex-shrink: 0;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      /* Review tools are outside the mobile app, and are not Android navigation. */
+      .studio {
+        max-width: 1220px;
+        min-height: 100dvh;
+        margin: auto;
+        padding: 40px 48px;
+        display: grid;
+        grid-template-columns: 266px minmax(0, 1fr);
+        gap: 86px;
+        align-items: start;
+      }
+      .study {
+        position: sticky;
+        top: 40px;
+      }
+      .study-mark {
+        font: 12px var(--mono);
+        letter-spacing: 0.08em;
+        display: flex;
+        justify-content: space-between;
+        border-top: 2px solid var(--studio-ink);
+        padding-top: 13px;
+      }
+      .study h1 {
+        font-size: 43px;
+        line-height: 1.02;
+        font-weight: 500;
+        letter-spacing: -2px;
+        margin: 30px 0 18px;
+      }
+      .study h1 span {
+        color: var(--studio-muted);
+      }
+      .study-intro {
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 26px;
+        max-width: 240px;
+        color: var(--studio-muted);
+      }
+      .screen-list {
+        display: grid;
+        gap: 4px;
+        border-top: 1px solid var(--studio-line);
+        padding-top: 14px;
+      }
+      .screen-link {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        border: 0;
+        border-radius: 3px;
+        background: transparent;
+        color: var(--studio-ink);
+        text-align: left;
+        min-height: 46px;
+        padding: 8px 10px;
+        font-size: 15px;
+      }
+      .screen-link .index {
+        font: 11px var(--mono);
+        color: var(--studio-muted);
+        width: 22px;
+      }
+      .screen-link .icon {
+        height: 22px;
+        width: 22px;
+        stroke-width: 2;
+      }
+      .screen-link[aria-current="page"] {
+        background: var(--studio-selected);
+        color: var(--on-studio-selected);
+      }
+      .screen-link[aria-current="page"] .index {
+        color: inherit;
+      }
+      .tool-group {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #a9afa1;
+      }
+      .tool-heading {
+        font: 11px var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+        color: var(--studio-muted);
+      }
+      .finish-controls,
+      .state-controls {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .review-button {
+        min-height: 36px;
+        border: 1px solid var(--studio-line);
+        border-radius: 4px;
+        padding: 7px 11px;
+        background: transparent;
+        color: var(--studio-ink);
+        font-size: 13px;
+      }
+      .review-button[aria-pressed="true"] {
+        background: var(--review-selected);
+        color: var(--on-review-selected);
+        border-color: var(--studio-ink);
+        box-shadow: 0 2px 0 #adb4a4;
+      }
+      .review-button svg {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+        margin-right: 4px;
+      }
+      .review-note {
+        font: 12px/1.6 var(--mono);
+        color: var(--studio-muted);
+        margin: 24px 0 0;
+      }
+      .review-note a {
+        color: inherit;
+        text-underline-offset: 3px;
+      }
+      .mobile-tools {
+        display: none;
+      }
+      .preview-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+      }
+      .preview-caption {
+        width: 420px;
+        max-width: 100%;
+        display: flex;
+        justify-content: space-between;
+        font: 11px var(--mono);
+        color: var(--studio-muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .preview-device {
+        width: 420px;
+        height: 860px;
+        max-width: 100%;
+        border: 1px solid #959e8c;
+        box-shadow:
+          0 24px 60px #343d2324,
+          0 2px 3px #343d231c;
+        position: relative;
+        background: var(--shell);
+        border-radius: 20px;
+        overflow: hidden;
+        color: var(--ink);
+      }
+      /* App primitives: 64–80 px actions, explicit labels, visible keyboard focus. */
+      .app {
+        height: 100%;
+        background: var(--shell);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        isolation: isolate;
+      }
+      .app-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 60px;
+        padding-bottom: 14px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .app-heading {
+        font-size: calc(25px * var(--type-scale));
+        letter-spacing: -0.8px;
+        line-height: 1.05;
+        margin: 0;
+        min-width: 0;
+        flex: 1;
+        font-weight: 650;
+      }
+      .app-heading:focus {
+        outline: none;
+      }
+      .brand-heading {
+        font-size: calc(29px * var(--type-scale));
+        font-weight: 600;
+        letter-spacing: -1.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .brand-heading .icon {
+        width: 32px;
+        height: 32px;
+        stroke-width: 2.5;
+      }
+      .icon-key {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--key-top);
+        color: var(--ink);
+        box-shadow: var(--key-shadow);
+      }
+      .icon-key .icon {
+        width: 30px;
+        height: 30px;
+      }
+      .icon-key.accent {
+        background: var(--accent);
+        border-color: transparent;
+        color: var(--on-accent);
+      }
+      .view {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap);
+      }
+      .key {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--key-top);
+        color: var(--ink);
+        box-shadow: var(--key-shadow);
+        padding: 14px;
+        min-height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        font-size: var(--control-text);
+        font-weight: 650;
+        line-height: 1.15;
+        text-align: center;
+      }
+      .key .icon {
+        width: 32px;
+        height: 32px;
+      }
+      .key.primary {
+        background: var(--accent);
+        border-color: transparent;
+        color: var(--on-accent);
+      }
+      .key.dark {
+        background: var(--well);
+        color: var(--on-well);
+        border-color: var(--line);
+        box-shadow:
+          inset 0 1px 0 #ffffff13,
+          0 3px 0 #141c13;
+      }
+      .key.flat {
+        background: transparent;
+        box-shadow: none;
+      }
+      .key.danger {
+        background: var(--danger);
+        color: var(--on-danger);
+        border-color: transparent;
+      }
+      .control-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px;
+      }
+      .control-row.three {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+      .control-row.three .key {
+        font-size: calc(18px * var(--type-scale));
+        padding: 12px 4px;
+        gap: 6px;
+        flex-direction: column;
+        min-height: 76px;
+      }
+      .control-row.three .icon {
+        width: 26px;
+        height: 26px;
+      }
+      .micro-label {
+        font: 12px/1.3 var(--mono);
+        letter-spacing: 0.03em;
+        color: var(--secondary);
+        margin: 0;
+      }
+      .section-label {
+        font: 13px var(--mono);
+        color: var(--secondary);
+        letter-spacing: 0.025em;
+        margin: 0;
+      }
+      .result {
+        font-size: calc(22px * var(--type-scale));
+        line-height: 1.22;
+        margin: 0;
+        min-height: 54px;
+        letter-spacing: -0.4px;
+      }
+      .result:empty {
+        display: none;
+      }
+      .status-banner {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        min-height: 66px;
+        border: 1px solid var(--line);
+        padding: 12px 15px;
+        border-radius: var(--radius);
+        background: var(--panel);
+        color: var(--ink);
+        flex-shrink: 0;
+      }
+      .status-banner .icon {
+        width: 35px;
+        height: 35px;
+      }
+      .status-banner strong {
+        font-size: calc(24px * var(--type-scale));
+        font-weight: 650;
+        line-height: 1.08;
+        letter-spacing: -0.5px;
+      }
+      .status-banner[data-status="clear"] {
+        background: var(--safe);
+        color: var(--on-safe);
+        border-color: transparent;
+      }
+      .status-banner[data-status="obstacle"] {
+        background: var(--danger);
+        color: var(--on-danger);
+        border-color: transparent;
+      }
+      /* Home: four function keys and a dominant, genuinely interactive Muse control. */
+      .home-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .home-key {
+        position: relative;
+        min-height: 163px;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-direction: column;
+        padding: 20px 16px;
+        text-align: left;
+        font-size: calc(23px * var(--type-scale));
+        letter-spacing: -0.65px;
+        font-weight: 600;
+      }
+      .home-key .icon {
+        width: 61px;
+        height: 61px;
+        stroke-width: 2.05;
+      }
+      .home-key .key-number {
+        position: absolute;
+        right: 12px;
+        top: 14px;
+        font: 11px var(--mono);
+        opacity: 0.65;
+      }
+      .home-key.footpath-key {
+        background: var(--well);
+        color: var(--on-well);
+        border-color: var(--line);
+      }
+      .home-key.footpath-key .icon {
+        color: #b6ce9e;
+      }
+      .home-key.scene-key,
+      #describeScene {
+        background: var(--scene-key);
+        color: var(--on-scene);
+        border-color: transparent;
+      }
+      :root[data-finish="night"] .home-key.footpath-key,
+      :root[data-finish="night"] #scanToggle {
+        background: var(--neon);
+        color: var(--on-neon);
+        border-color: var(--neon);
+      }
+      :root[data-finish="night"] .home-key.footpath-key .icon {
+        color: inherit;
+      }
+      :root[data-finish="night"] button[data-muse] {
+        background: var(--neon);
+        color: var(--on-neon);
+        border-color: var(--neon);
+        box-shadow:
+          inset 0 1px 0 #ffffff60,
+          0 3px 0 #456509;
+      }
+      .voice-area {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-direction: column;
+        padding: 12px 0 8px;
+        gap: 13px;
+        min-height: 205px;
+      }
+      .voice-control {
+        width: 166px;
+        height: 166px;
+        border: 10px solid var(--shell);
+        outline: 1px solid var(--line);
+        outline-offset: 0;
+        border-radius: 50%;
+        background: var(--well);
+        color: var(--on-well);
+        box-shadow:
+          0 5px 0 #141c1329,
+          inset 0 1px 1px #ffffff20;
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+      .voice-control::after {
+        content: "";
+        position: absolute;
+        inset: 9px;
+        border: 1px solid #ffffff25;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      :root[data-finish="night"] .voice-control[data-muse] {
+        border-color: #000000;
+        outline: 2px solid var(--neon);
+        outline-offset: 3px;
+      }
+      :root[data-finish="night"] .voice-control[data-muse]::after {
+        border-color: #17240055;
+      }
+      :root[data-finish="night"] .voice-control[data-muse]:focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 5px;
+      }
+      .voice-control .icon {
+        width: 70px;
+        height: 70px;
+        stroke-width: 2.25;
+      }
+      .voice-control:focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 4px;
+      }
+      .voice-label {
+        font-size: calc(23px * var(--type-scale));
+        font-weight: 600;
+        letter-spacing: -0.5px;
+        margin: 0;
+      }
+      .wake-hint {
+        font: 14px var(--mono);
+        color: var(--secondary);
+        margin: 0;
+      }
+      /* Native-feeling camera & map stages; illustrations never imply live data. */
+      .map-space,
+      .camera-space {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius);
+        background: #b7beb1;
+        min-height: 170px;
+        flex: 1;
+        border: 1px solid var(--line);
+      }
+      .map-art,
+      .street-art {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        inset: 0;
+        display: block;
+      }
+      .map-art .route-border {
+        stroke: #f9f8f1;
+        stroke-width: 14;
+        fill: none;
+        stroke-linejoin: round;
+      }
+      .map-art .route-line {
+        stroke: #e26942;
+        stroke-width: 7;
+        fill: none;
+        stroke-linejoin: round;
+      }
+      .demo-route {
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .app[data-route="active"] .demo-route {
+        opacity: 1;
+      }
+      .stage-label {
+        position: absolute;
+        left: 9px;
+        bottom: 9px;
+        background: #f5f5ecee;
+        color: #253026;
+        font: 12px var(--mono);
+        padding: 7px 9px;
+        border: 1px solid #a5ae9e;
+        border-radius: 3px;
+        pointer-events: none;
+      }
+      .center-map {
+        position: absolute;
+        left: 9px;
+        top: 9px;
+        width: 50px;
+        height: 50px;
+        background: #f0f2e9;
+        color: #253026;
+        border-color: #b3bbab;
+        box-shadow: 0 2px 0 #a1ab98;
+      }
+      .camera-overlay {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 132px;
+        height: 132px;
+        border: 2px solid #253026;
+        background: #253026;
+        border-radius: 5px;
+        overflow: hidden;
+        color: #f3f5eb;
+        touch-action: none;
+        z-index: 2;
+      }
+      .camera-handle {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: grab;
+        font: 12px var(--mono);
+        user-select: none;
+      }
+      .camera-handle .icon {
+        width: 20px;
+        height: 20px;
+      }
+      .overlay-view {
+        height: 98px;
+        position: relative;
+        pointer-events: none;
+      }
+      .overlay-view .street-art {
+        object-fit: cover;
+      }
+      .guide-strip {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 25%;
+        right: 25%;
+        border-inline: 1px solid #ffffffe0;
+        background: #ffffff0b;
+        pointer-events: none;
+      }
+      .guide-strip::before,
+      .guide-strip::after {
+        content: "";
+        position: absolute;
+        width: 50%;
+        top: 0;
+        bottom: 0;
+        background: #0002;
+      }
+      .guide-strip::before {
+        right: 100%;
+      }
+      .guide-strip::after {
+        left: 100%;
+      }
+      .obstacle-box {
+        position: absolute;
+        left: 38%;
+        top: 61%;
+        width: 26%;
+        height: 24%;
+        border: 3px solid #f1a187;
+        display: none;
+      }
+      .obstacle-box span {
+        position: absolute;
+        top: -27px;
+        left: -3px;
+        background: #f1a187;
+        color: #35190d;
+        padding: 3px 8px;
+        font: 13px var(--mono);
+      }
+      .simulated-cat {
+        display: none;
+      }
+      .app[data-view-state="obstacle"] .simulated-cat {
+        display: initial;
+      }
+      .app[data-view-state="obstacle"] .obstacle-box {
+        display: block;
+      }
+      .camera-paused {
+        position: absolute;
+        inset: 0;
+        background: #253026d9;
+        color: #f3f4eb;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+      .camera-paused .icon {
+        width: 64px;
+        height: 64px;
+      }
+      .camera-paused strong {
+        font-size: calc(24px * var(--type-scale));
+        font-weight: 500;
+      }
+      .camera-tip {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 9px;
+        background: #253026e6;
+        color: #f3f4eb;
+        font: 12px var(--mono);
+        border-radius: 3px;
+      }
+      .camera-tip .icon {
+        height: 20px;
+        width: 20px;
+      }
+      .maneuver {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        min-height: 68px;
+      }
+      .maneuver > .icon {
+        width: 48px;
+        height: 48px;
+        stroke-width: 2.3;
+      }
+      .maneuver div {
+        flex: 1;
+        min-width: 0;
+      }
+      .maneuver h2 {
+        font-size: calc(27px * var(--type-scale));
+        font-weight: 600;
+        margin: 0 0 5px;
+        letter-spacing: -0.7px;
+        line-height: 1.08;
+      }
+      .maneuver p {
+        margin: 0;
+        font-size: calc(16px * var(--type-scale));
+        color: var(--secondary);
+        line-height: 1.2;
+      }
+      .destination-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .destination-key {
+        flex-direction: column;
+        gap: 9px;
+        min-height: 100px;
+        padding: 12px 3px;
+        font-size: calc(16px * var(--type-scale));
+        position: relative;
+        font-weight: 600;
+      }
+      .destination-key .icon {
+        height: 34px;
+        width: 34px;
+      }
+      .destination-key[aria-pressed="true"] {
+        outline: 2px solid var(--ink);
+        outline-offset: -4px;
+        background: var(--panel);
+      }
+      .destination-key[aria-pressed="true"]::after {
+        content: "✓";
+        position: absolute;
+        right: 5px;
+        top: 3px;
+        font-size: 16px;
+      }
+      .destination-grid.in-dialog {
+        grid-template-columns: 1fr 1fr;
+      }
+      .destination-grid.in-dialog .destination-key {
+        min-height: 118px;
+        font-size: 22px;
+      }
+      .destination-grid.in-dialog .icon {
+        width: 43px;
+        height: 43px;
+      }
+      .scene-result {
+        border-left: 3px solid var(--accent);
+        background: var(--panel);
+        padding: 17px 17px 19px;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        min-height: 142px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .scene-result .result {
+        font-size: calc(23px * var(--type-scale));
+        margin: 0;
+        min-height: 0;
+      }
+      /* Audio practice uses actual short Web Audio tones on a deliberate tap. */
+      .cue-key {
+        min-height: 114px;
+        justify-content: flex-start;
+        text-align: left;
+        padding: 18px;
+        gap: 22px;
+      }
+      .cue-key > .icon {
+        width: 50px;
+        height: 50px;
+        stroke-width: 2;
+      }
+      .cue-copy {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .cue-copy strong {
+        font-size: calc(23px * var(--type-scale));
+        font-weight: 600;
+      }
+      .cue-copy small {
+        font: calc(14px * var(--type-scale)) var(--mono);
+        color: var(--secondary);
+      }
+      .cue-key > .play-glyph {
+        width: 26px;
+        height: 26px;
+      }
+      .audio-spacer {
+        flex: 1;
+        min-height: 5px;
+      }
+      .training-feedback {
+        background: var(--panel);
+        min-height: 76px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        font-size: calc(18px * var(--type-scale));
+      }
+      .training-feedback .icon {
+        width: 28px;
+        height: 28px;
+      }
+      .settings-block {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 0 16px;
+      }
+      .setting {
+        padding: 18px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .setting:last-child {
+        border: 0;
+      }
+      .setting-label {
+        font-size: calc(20px * var(--type-scale));
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .setting-label .icon {
+        width: 25px;
+        height: 25px;
+      }
+      .segments {
+        display: flex;
+        gap: 5px;
+      }
+      .segment {
+        flex: 1;
+        min-height: 56px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: var(--key);
+        color: var(--ink);
+        padding: 9px 5px;
+        font-size: calc(17px * var(--type-scale));
+        font-weight: 600;
+      }
+      .segment[aria-pressed="true"] {
+        background: var(--well);
+        color: var(--on-well);
+        border-color: var(--well);
+        box-shadow:
+          inset 0 0 0 2px var(--well),
+          inset 0 0 0 3px #ffffff55;
+      }
+      .segment[aria-pressed="true"]::before {
+        content: "✓ ";
+        font-size: 0.8em;
+      }
+      .setting-inline {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 84px;
+      }
+      .toggle {
+        width: 68px;
+        height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: var(--key);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .toggle::after {
+        content: "";
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        width: 26px;
+        height: 28px;
+        background: var(--secondary);
+        border-radius: 2px;
+        transition: left 0.12s;
+      }
+      .toggle[aria-checked="true"] {
+        background: var(--safe);
+      }
+      .toggle[aria-checked="true"]::after {
+        left: 35px;
+        background: var(--on-safe);
+      }
+      /* Dialogs are global, focus-trapping, keyboard accessible and labelled. */
+      dialog {
+        width: 390px;
+        max-width: calc(100vw - 28px);
+        max-height: calc(100dvh - 36px);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--shell);
+        color: var(--ink);
+        padding: 22px;
+        box-shadow: 0 28px 80px #0004;
+        overflow: auto;
+        font-family: var(--sans);
+      }
+      dialog::backdrop {
+        background: #0a110ed4;
+        backdrop-filter: blur(3px);
+      }
+      .dialog-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .dialog-header > .icon {
+        width: 34px;
+        height: 34px;
+      }
+      .dialog-header h2 {
+        font-size: 28px;
+        letter-spacing: -0.7px;
+        font-weight: 600;
+        flex: 1;
+        margin: 0;
+      }
+      .dialog-header .icon-key {
+        width: 48px;
+        height: 48px;
+        box-shadow: none;
+      }
+      .dialog-header .icon-key .icon {
+        width: 24px;
+        height: 24px;
+      }
+      .dialog-body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .dialog-body p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.4;
+      }
+      .dialog-body .small-print {
+        font: 13px/1.4 var(--mono);
+        color: var(--secondary);
+      }
+      .muse-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--well);
+        color: var(--on-well);
+        padding: 16px;
+        font-size: 21px;
+        border-radius: var(--radius);
+      }
+      .muse-indicator .icon {
+        width: 33px;
+        height: 33px;
+      }
+      .command-label {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .command-input {
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 15px;
+        width: 100%;
+        min-height: 62px;
+        background: var(--panel);
+        color: var(--ink);
+        font-size: 18px;
+        margin-top: 8px;
+      }
+      .command-input::placeholder {
+        color: var(--secondary);
+      }
+      .example-commands {
+        display: grid;
+        gap: 8px;
+      }
+      .example-command {
+        border: 1px solid var(--line);
+        background: var(--key-top);
+        color: var(--ink);
+        border-radius: 5px;
+        min-height: 55px;
+        text-align: left;
+        padding: 12px 13px;
+        font-size: 17px;
+      }
+      .muse-answer {
+        background: var(--panel);
+        padding: 15px;
+        border-left: 3px solid var(--accent);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .muse-answer p {
+        font-size: 21px;
+        line-height: 1.3;
+      }
+      .toast {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        padding: 14px 17px;
+        background: var(--well);
+        color: var(--on-well);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        font-size: 17px;
+        line-height: 1.3;
+        box-shadow: 0 5px 20px #0002;
+        z-index: 10;
+        pointer-events: none;
+      }
+      /* Fit app screens without a scroll feed. Larger text may reflow controls. */
+      :root[data-type="large"] .home-grid {
+        grid-template-columns: 1fr;
+      }
+      :root[data-type="large"] .home-key {
+        min-height: 84px;
+        font-size: 24px;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 18px;
+        padding: 12px 16px;
+      }
+      :root[data-type="large"] .home-key .icon {
+        width: 46px;
+        height: 46px;
+      }
+      :root[data-type="large"] .home-key br {
+        display: none;
+      }
+      :root[data-type="large"] .destination-grid:not(.in-dialog) {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      :root[data-type="large"]
+        .destination-key:not(.in-dialog .destination-key) {
+        min-height: 64px;
+        flex-direction: row;
+        font-size: 19px;
+        padding: 8px;
+        gap: 8px;
+      }
+      :root[data-type="large"] .map-space {
+        min-height: 140px;
+      }
+      :root[data-type="large"] .cue-key {
+        min-height: 114px;
+      }
+      :root[data-type="large"] .setting {
+        padding: 13px 0;
+      }
+      @media (min-width: 800px) and (max-height: 940px) {
+        .studio {
+          padding-top: 26px;
+          padding-bottom: 26px;
+        }
+        .study {
+          top: 26px;
+        }
+        .preview-device {
+          height: calc(100dvh - 84px);
+          min-height: 680px;
+        }
+        .home-key {
+          min-height: 144px;
+        }
+        .voice-area {
+          min-height: 180px;
+        }
+        .voice-control {
+          width: 150px;
+          height: 150px;
+        }
+      }
+      @media (max-width: 980px) and (min-width: 800px) {
+        .studio {
+          padding-inline: 28px;
+          gap: 36px;
+          grid-template-columns: 230px 1fr;
+        }
+        .study h1 {
+          font-size: 38px;
+        }
+      }
+      @media (max-width: 799px) {
+        body {
+          background: var(--shell);
+        }
+        .studio {
+          display: block;
+          padding: 0;
+          min-height: 100dvh;
+        }
+        .study {
+          position: relative;
+          display: none;
+        }
+        .preview-area {
+          display: block;
+        }
+        .preview-caption {
+          display: none;
+        }
+        .preview-device {
+          width: 100%;
+          max-width: 480px;
+          margin: auto;
+          height: calc(100dvh - 48px);
+          min-height: 580px;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+        .mobile-tools {
+          display: block;
+          position: relative;
+          z-index: 5;
+          background: #d3d5cd;
+          color: #263022;
+          border-bottom: 1px solid #afb7a4;
+        }
+        .mobile-tools summary {
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 16px;
+          font: 12px var(--mono);
+          cursor: pointer;
+          list-style: none;
+        }
+        .mobile-tools summary::after {
+          content: "Design tools +";
+        }
+        .mobile-tools[open] summary::after {
+          content: "Close tools −";
+        }
+        .mobile-tool-content {
+          padding: 8px 16px 18px;
+          display: grid;
+          gap: 14px;
+        }
+        .mobile-tool-content .screen-list {
+          grid-template-columns: 1fr 1fr;
+          border-top: 0;
+          padding-top: 0;
+        }
+        .mobile-tool-content .tool-group {
+          margin-top: 0;
+        }
+        .mobile-tool-content .review-note {
+          margin: 0;
+          font-size: 11px;
+        }
+        .app {
+          padding: 14px 16px;
+        }
+        .app-header {
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          min-height: 60px;
+        }
+        .home-key {
+          min-height: 155px;
+        }
+        .voice-area {
+          min-height: 184px;
+        }
+        .voice-control {
+          width: 152px;
+          height: 152px;
+        }
+      }
+      @media (max-height: 760px) and (max-width: 799px) {
+        .app {
+          padding: 10px 14px;
+        }
+        .app-header {
+          min-height: 52px;
+          margin-bottom: 10px;
+          padding-bottom: 9px;
+        }
+        .app-header .icon-key {
+          width: 48px;
+          height: 48px;
+        }
+        .home-key {
+          min-height: 128px;
+          padding: 14px;
+        }
+        .home-key .icon {
+          width: 48px;
+          height: 48px;
+        }
+        .voice-control {
+          width: 136px;
+          height: 136px;
+        }
+        .voice-control .icon {
+          height: 58px;
+          width: 58px;
+        }
+        .voice-area {
+          min-height: 166px;
+          padding-top: 5px;
+          gap: 8px;
+        }
+        .status-banner {
+          min-height: 59px;
+          padding: 10px 12px;
+        }
+        .view {
+          gap: 10px;
+        }
+        .map-space,
+        .camera-space {
+          min-height: 140px;
+        }
+        .key {
+          min-height: 61px;
+        }
+        .destination-key {
+          min-height: 87px;
+        }
+        .control-row.three .key {
+          min-height: 65px;
+        }
+        .cue-key {
+          min-height: 98px;
+        }
+        .settings-block {
+          padding: 0 13px;
+        }
+        .setting {
+          padding: 12px 0;
+        }
+        .setting-inline {
+          min-height: 66px;
+        }
+        .segment {
+          min-height: 46px;
+        }
+      }
+      @media (max-width: 359px) {
+        .app {
+          padding-inline: 12px;
+        }
+        .app-heading {
+          font-size: 22px;
+        }
+        .brand-heading {
+          font-size: 25px;
+        }
+        .home-key {
+          font-size: 20px;
+          padding: 13px;
+        }
+        .home-key .icon {
+          width: 49px;
+          height: 49px;
+        }
+        .key {
+          gap: 8px;
+        }
+        .destination-key {
+          font-size: 14px;
+        }
+        .destination-key .icon {
+          height: 28px;
+          width: 28px;
+        }
+        .status-banner strong {
+          font-size: 21px;
+        }
+        .control-row.three .key {
+          font-size: 16px;
+        }
+        .result {
+          font-size: 20px;
+        }
+        .setting-label {
+          font-size: 18px;
+        }
+        .control-row:not(.three) .key {
+          font-size: calc(18px * var(--type-scale));
+          padding: 12px 10px;
+          gap: 8px;
+        }
+        .control-row:not(.three) .key .icon {
+          width: 26px;
+          height: 26px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+      @media (forced-colors: active) {
+        button {
+          border: 2px solid ButtonText;
+        }
+        .status-banner {
+          border: 2px solid CanvasText;
+        }
+        .icon {
+          stroke: currentColor;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true">
+      <defs>
+        <symbol id="i-brand" viewBox="0 0 32 32">
+          <path fill="currentColor" stroke="none" d="M4 10H7V23H14V26H4Z" />
+          <path
+            fill="currentColor"
+            stroke="none"
+            d="M12 6H15.4L21 21.4L26.6 6H30L22.6 26H19.4Z"
+          />
+          <circle
+            fill="currentColor"
+            stroke="none"
+            cx="5.5"
+            cy="5.5"
+            r="1.75"
+          />
+        </symbol>
+        <symbol id="i-navigate" viewBox="0 0 32 32">
+          <path d="M27 4 19 28 14 18 4 13Z" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-footpath" viewBox="0 0 32 32">
+          <path d="M7 28 13 5m12 23L19 5M16 27v-4m0-6v-4m0-6V5" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 32 32">
+          <path d="M3 16s5-9 13-9 13 9 13 9-5 9-13 9S3 16 3 16Z" />
+          <circle cx="16" cy="16" r="4" />
+        </symbol>
+        <symbol id="i-audio" viewBox="0 0 32 32">
+          <path
+            d="M5 19v-4a11 11 0 0 1 22 0v4M5 16h5v11H7a2 2 0 0 1-2-2Zm22 0h-5v11h3a2 2 0 0 0 2-2Z"
+          />
+        </symbol>
+        <symbol id="i-mic" viewBox="0 0 32 32">
+          <rect x="11" y="3" width="10" height="17" rx="5" />
+          <path d="M6 15v1a10 10 0 0 0 20 0v-1M16 26v4m-5 0h10" />
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 32 32">
+          <path
+            d="M13 3h6l1 4 2 1 4-1 3 5-3 3v2l3 3-3 5-4-1-2 1-1 4h-6l-1-4-2-1-4 1-3-5 3-3v-2l-3-3 3-5 4 1 2-1Z"
+          />
+          <circle cx="16" cy="16" r="4.5" />
+        </symbol>
+        <symbol id="i-back" viewBox="0 0 32 32">
+          <path d="M27 16H5m9-9-9 9 9 9" />
+        </symbol>
+        <symbol id="i-left" viewBox="0 0 32 32">
+          <path d="M25 28V15a5 5 0 0 0-5-5H5m8-8-8 8 8 8" />
+        </symbol>
+        <symbol id="i-right" viewBox="0 0 32 32">
+          <path d="M7 28V15a5 5 0 0 1 5-5h15m-8-8 8 8-8 8" />
+        </symbol>
+        <symbol id="i-forward" viewBox="0 0 32 32">
+          <path d="M16 28V4M6 14 16 4l10 10" />
+        </symbol>
+        <symbol id="i-stop" viewBox="0 0 32 32">
+          <rect
+            x="7"
+            y="7"
+            width="18"
+            height="18"
+            rx="1"
+            fill="currentColor"
+            stroke="none"
+          />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 32 32">
+          <path d="m10 5 18 11-18 11Z" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-speaker" viewBox="0 0 32 32">
+          <path
+            d="M4 12h6l7-6v20l-7-6H4Zm18-1a7 7 0 0 1 0 10m4-15a14 14 0 0 1 0 20"
+          />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 32 32">
+          <circle cx="14" cy="14" r="9" />
+          <path d="m21 21 8 8" />
+        </symbol>
+        <symbol id="i-center" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="9" />
+          <circle cx="16" cy="16" r="3" fill="currentColor" stroke="none" />
+          <path d="M16 2v5m0 18v5M2 16h5m18 0h5" />
+        </symbol>
+        <symbol id="i-park" viewBox="0 0 32 32">
+          <path d="m16 3-9 10h4l-6 9h22l-6-9h4ZM16 22v7m-6 0h12" />
+        </symbol>
+        <symbol id="i-market" viewBox="0 0 32 32">
+          <path
+            d="M5 15v13h22V15M3 10l4-6h18l4 6v5H3Zm8 5v-5m10 5v-5M11 28v-8h10v8"
+          />
+        </symbol>
+        <symbol id="i-bus" viewBox="0 0 32 32">
+          <rect x="6" y="3" width="20" height="24" rx="4" />
+          <path d="M6 16h20M6 9h20M10 27v3m12-3v3" />
+          <circle cx="11" cy="22" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="21" cy="22" r="1.5" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-pharmacy" viewBox="0 0 32 32">
+          <path d="M12 4h8v8h8v8h-8v8h-8v-8H4v-8h8Z" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 32 32">
+          <path d="m7 16 6 6L26 9" />
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 32 32">
+          <path d="m16 3 14 25H2Zm0 8v7" />
+          <circle cx="16" cy="23" r="1.4" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-close" viewBox="0 0 32 32">
+          <path d="m7 7 18 18M25 7 7 25" />
+        </symbol>
+        <symbol id="i-chevron" viewBox="0 0 32 32">
+          <path d="m12 6 10 10-10 10" />
+        </symbol>
+        <symbol id="i-send" viewBox="0 0 32 32">
+          <path d="m3 4 26 12L3 28l4-12Zm4 12h22" />
+        </symbol>
+        <symbol id="i-vibrate" viewBox="0 0 32 32">
+          <rect x="11" y="6" width="10" height="20" rx="2" />
+          <path d="m5 8-3 4 3 4-3 4 3 4m22-16 3 4-3 4 3 4-3 4" />
+        </symbol>
+        <symbol id="i-grip" viewBox="0 0 32 32">
+          <path d="M9 12h14M9 19h14" />
+        </symbol>
+        <symbol id="i-sun" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="6" />
+          <path
+            d="M16 2v3m0 22v3M2 16h3m22 0h3M6 6l2 2m16 16 2 2M6 26l2-2M24 8l2-2"
+          />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 32 32">
+          <path d="M26 20A12 12 0 0 1 12 4a12 12 0 1 0 14 16Z" />
+        </symbol>
+        <symbol id="i-pause" viewBox="0 0 32 32">
+          <path d="M11 7v18M21 7v18" stroke-width="5" />
+        </symbol>
+        <symbol id="i-clear" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="12" />
+          <path d="m10 16 4 4 8-8" />
+        </symbol>
+        <symbol id="i-phone" viewBox="0 0 32 32">
+          <rect x="9" y="3" width="14" height="26" rx="2" />
+          <path d="M14 25h4" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 32 32">
+          <path d="M16 6v20M6 16h20" />
+        </symbol>
+        <symbol id="i-help" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="12" />
+          <path d="M12 11a4 4 0 1 1 7 3c-2 1-3 2-3 5" />
+          <circle cx="16" cy="24" r="1.3" fill="currentColor" stroke="none" />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="studio">
+      <aside class="study" aria-label="Prototype review tools">
+        <div class="study-mark">
+          <span>LV / INTERFACE STUDY</span><span>01</span>
+        </div>
+        <h1>LibreVision<br /><span>made clearer.</span></h1>
+        <p class="study-intro">
+          An instrument for getting around.<br />Big symbols. Fewer decisions.
+        </p>
+        <nav class="screen-list" aria-label="Preview screens">
+          <button class="screen-link" data-screen="home" aria-current="page">
+            <span class="index">00</span
+            ><svg class="icon" aria-hidden="true"><use href="#i-brand" /></svg
+            >Home
+          </button>
+          <button class="screen-link" data-screen="navigation">
+            <span class="index">01</span
+            ><svg class="icon" aria-hidden="true">
+              <use href="#i-navigate" /></svg
+            >Navigation
+          </button>
+          <button class="screen-link" data-screen="footpath">
+            <span class="index">02</span
+            ><svg class="icon" aria-hidden="true">
+              <use href="#i-footpath" /></svg
+            >Check Footpath
+          </button>
+          <button class="screen-link" data-screen="scene">
+            <span class="index">03</span
+            ><svg class="icon" aria-hidden="true"><use href="#i-eye" /></svg
+            >Surroundings
+          </button>
+          <button class="screen-link" data-screen="training">
+            <span class="index">04</span
+            ><svg class="icon" aria-hidden="true"><use href="#i-audio" /></svg
+            >Audio cues
+          </button>
+          <button class="screen-link" data-screen="settings">
+            <span class="index">05</span
+            ><svg class="icon" aria-hidden="true">
+              <use href="#i-settings" /></svg
+            >Settings
+          </button>
+        </nav>
+        <div class="tool-group">
+          <p class="tool-heading">Finish</p>
+          <div class="finish-controls">
+            <button
+              class="review-button"
+              data-finish="field"
+              aria-pressed="true"
+            >
+              <svg class="icon" aria-hidden="true"><use href="#i-sun" /></svg
+              >Field</button
+            ><button
+              class="review-button"
+              data-finish="night"
+              aria-pressed="false"
+            >
+              <svg class="icon" aria-hidden="true"><use href="#i-moon" /></svg
+              >Night
+            </button>
+          </div>
+        </div>
+        <div class="tool-group demo-tools">
+          <p class="tool-heading">Camera state · simulated</p>
+          <div class="state-controls">
+            <button
+              class="review-button"
+              data-demo-state="clear"
+              aria-pressed="true"
+            >
+              No obstruction</button
+            ><button
+              class="review-button"
+              data-demo-state="obstacle"
+              aria-pressed="false"
+            >
+              Obstacle</button
+            ><button
+              class="review-button"
+              data-demo-state="tilt"
+              aria-pressed="false"
+            >
+              Phone tilted
+            </button>
+          </div>
+        </div>
+        <p class="review-note">
+          HTML design prototype.<br />Camera, maps &amp; Muse are simulated.<br />No
+          microphone or API access.
+        </p>
+        <p class="review-note">
+          Visual references<br /><a
+            href="https://teenage.engineering/products/op-1"
+            target="_blank"
+            rel="noopener noreferrer"
+            >OP–1 field ↗</a
+          >
+          /
+          <a
+            href="https://teenage.engineering/products/ep-133"
+            target="_blank"
+            rel="noopener noreferrer"
+            >K.O. II ↗</a
+          >
+        </p>
+      </aside>
+      <div class="preview-area">
+        <details class="mobile-tools">
+          <summary>LibreVision / design preview</summary>
+          <div class="mobile-tool-content" id="mobileTools"></div>
+        </details>
+        <div class="preview-caption">
+          <span id="screenCaption">00 / Home</span
+          ><span>Interactive prototype</span>
+        </div>
+        <div class="preview-device" id="device">
+          <div class="app" id="app" data-route="idle" data-view-state="clear">
+            <header class="app-header">
+              <button
+                class="icon-key"
+                id="backButton"
+                data-screen="home"
+                aria-label="Back to Home"
+                hidden
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-back" />
+                </svg>
+              </button>
+              <h1
+                class="app-heading brand-heading"
+                id="appHeading"
+                tabindex="-1"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-brand" /></svg
+                ><span>LibreVision</span>
+              </h1>
+              <button
+                class="icon-key"
+                id="settingsButton"
+                data-screen="settings"
+                aria-label="Settings"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-settings" />
+                </svg>
+              </button>
+              <button
+                class="icon-key accent"
+                id="headerMuse"
+                data-muse
+                aria-label="Ask Muse"
+                hidden
+              >
+                <svg class="icon" aria-hidden="true"><use href="#i-mic" /></svg>
+              </button>
+            </header>
+            <main class="view" id="home" aria-label="Home">
+              <div class="home-grid">
+                <button class="key home-key primary" data-screen="navigation">
+                  <span class="key-number" aria-hidden="true">01</span
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-navigate" /></svg
+                  ><span>Navigate</span>
+                </button>
+                <button
+                  class="key home-key footpath-key"
+                  data-screen="footpath"
+                >
+                  <span class="key-number" aria-hidden="true">02</span
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-footpath" /></svg
+                  ><span>Check <br />Footpath</span>
+                </button>
+                <button class="key home-key scene-key" data-screen="scene">
+                  <span class="key-number" aria-hidden="true">03</span
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-eye" /></svg
+                  ><span>Describe <br />Surroundings</span>
+                </button>
+                <button class="key home-key" data-screen="training">
+                  <span class="key-number" aria-hidden="true">04</span
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="#i-audio" /></svg
+                  ><span>Learn <br />Audio Cues</span>
+                </button>
+              </div>
+              <div class="voice-area">
+                <button
+                  class="voice-control"
+                  data-muse
+                  aria-label="Open Muse voice-command preview"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-mic" />
+                  </svg>
+                </button>
+                <p class="voice-label">Ask Muse</p>
+                <p class="wake-hint">“Hey Vision”</p>
+              </div>
+            </main>
+            <main class="view" id="navigation" aria-label="Navigation" hidden>
+              <div
+                class="status-banner"
+                data-status="paused"
+                id="navStatus"
+                role="status"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-pause" /></svg
+                ><strong>Camera paused</strong>
+              </div>
+              <div class="map-space" id="mapStage">
+                <svg
+                  class="map-art"
+                  viewBox="0 0 560 620"
+                  preserveAspectRatio="xMidYMid slice"
+                  role="img"
+                  aria-label="Illustrated demo map. No live GPS or real route."
+                >
+                  <rect width="560" height="620" fill="#dfdfd4" />
+                  <g fill="#c3d4b6">
+                    <path d="M0 0h170v150H0Z" />
+                    <path d="M370 402h190v218H370Z" />
+                    <path d="m100 460 80-32 42 123-88 28Z" />
+                  </g>
+                  <g fill="#c3c4ba" stroke="#b4b5ac" stroke-width="1.5">
+                    <path
+                      d="M204 0h91v100h-91ZM335 0h70v100h-70ZM436 0h124v100H436ZM0 191h94v80H0ZM129 190h168v82H129ZM337 142h68v130h-68ZM439 142h121v130H439ZM0 317h94v90H0ZM130 317h166v89H130ZM340 317h65v45h-65ZM444 315h116v47H444ZM0 449h71v150H0ZM257 452h62v168h-62Z"
+                    />
+                  </g>
+                  <g fill="none" stroke="#f9f8f1" stroke-width="29">
+                    <path
+                      d="M-10 167h580M-10 294h580M-10 430h580M111-20v680M318-20v680M422-20v680"
+                    />
+                  </g>
+                  <g
+                    fill="none"
+                    stroke="#aaa99d"
+                    stroke-width="1.2"
+                    stroke-dasharray="4 8"
+                  >
+                    <path
+                      d="M0 167h560M111 0v620M318 0v620M422 0v620M0 430h560"
+                    />
+                  </g>
+                  <g fill="#686a5e" font-family="monospace" font-size="12">
+                    <text x="147" y="156">ROAD 12</text>
+                    <text x="153" y="420">MAIN ROAD</text>
+                    <text x="28" y="67">PARK</text>
+                    <text x="453" y="510">PARK</text>
+                  </g>
+                  <g class="demo-route">
+                    <path class="route-border" d="M318 535V294H111V167" />
+                    <path class="route-line" d="M318 535V294H111V167" />
+                    <circle
+                      cx="111"
+                      cy="167"
+                      r="13"
+                      fill="#ec613e"
+                      stroke="#fffdf5"
+                      stroke-width="5"
+                    />
+                  </g>
+                  <circle
+                    cx="318"
+                    cy="535"
+                    r="28"
+                    fill="#151b1a"
+                    opacity=".1"
+                  />
+                  <circle
+                    cx="318"
+                    cy="535"
+                    r="11"
+                    fill="#151b1a"
+                    stroke="#fffdf5"
+                    stroke-width="5"
+                  />
+                </svg>
+                <button
+                  class="icon-key center-map"
+                  id="centerMap"
+                  aria-label="Center demo map"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-center" />
+                  </svg>
+                </button>
+                <div class="camera-overlay" id="cameraOverlay">
+                  <div
+                    class="camera-handle"
+                    id="cameraHandle"
+                    tabindex="0"
+                    role="button"
+                    aria-label="Move camera preview. Drag or use arrow keys."
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-grip" /></svg
+                    >View · demo
+                  </div>
+                  <div class="overlay-view">
+                    <svg
+                      class="street-art"
+                      viewBox="0 0 600 720"
+                      preserveAspectRatio="xMidYMid slice"
+                      role="img"
+                      aria-label="Illustrated camera placeholder, not a live camera. A simulated cat can be shown in the central warning zone."
+                    >
+                      <rect width="600" height="720" fill="#cfdbd8" />
+                      <path d="M0 0h176v450L0 585Z" fill="#a0aaa3" />
+                      <path d="M0 0h52v542L0 585Z" fill="#b8c0b5" />
+                      <g fill="#667b70">
+                        <path
+                          d="M75 53h60v96H75ZM75 199h60v96H75ZM75 344h60v96H75Z"
+                        />
+                      </g>
+                      <g stroke="#b6c4b8" stroke-width="7">
+                        <path d="M105 53v96M105 199v96M105 344v96" />
+                      </g>
+                      <path d="M600 31H410v403l190 111Z" fill="#b4b5a5" />
+                      <path d="M600 49H490v368l110 49Z" fill="#c5c5b4" />
+                      <path d="M410 329h190v101H410Z" fill="#d3d0b8" />
+                      <path d="M395 319h205v34H395Z" fill="#d47758" />
+                      <path d="M425 368h50v66h-50Z" fill="#6e8175" />
+                      <path d="M492 368h92v62h-92Z" fill="#91a39a" />
+                      <path d="M176 450h234l190 270H0Z" fill="#b0b6aa" />
+                      <path
+                        d="m212 450-77 270H0l176-270ZM376 450l116 270h108L410 450Z"
+                        fill="#d9d9c6"
+                      />
+                      <g stroke="#a5aa9c" stroke-width="2">
+                        <path
+                          d="m201 490 190 0M184 551h238M167 613h298M149 677h346M290 450l-4 270"
+                        />
+                      </g>
+                      <g fill="#647b5e">
+                        <path d="M189 438v-96h9v96Z" />
+                        <circle cx="194" cy="314" r="38" />
+                        <circle cx="176" cy="333" r="25" />
+                        <circle cx="214" cy="338" r="26" />
+                      </g>
+                      <g fill="#80957b">
+                        <circle cx="354" cy="410" r="17" />
+                        <path d="M350 420h8v31h-8Z" />
+                      </g>
+                      <g
+                        class="simulated-cat"
+                        fill="#464c42"
+                        stroke="#464c42"
+                        stroke-linejoin="round"
+                      >
+                        <ellipse cx="300" cy="571" rx="39" ry="23" />
+                        <path
+                          d="M320 555v-28l10 11 16-9 2 31ZM278 581v34h10v-26m35-4v28h10v-36M265 566c-24-13-18-36-9-37"
+                          stroke-width="8"
+                          fill="none"
+                        />
+                        <circle
+                          cx="331"
+                          cy="547"
+                          r="3"
+                          fill="#e3e6cc"
+                          stroke="none"
+                        />
+                      </g>
+                    </svg>
+                    <div class="guide-strip"></div>
+                  </div>
+                </div>
+                <div class="stage-label">DEMO MAP · NO LIVE GPS</div>
+              </div>
+              <div class="maneuver" id="navManeuver">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-navigate" />
+                </svg>
+                <div>
+                  <h2 id="navInstruction">Where to?</h2>
+                  <p id="navDistance">Choose a destination below.</p>
+                </div>
+              </div>
+              <div
+                class="destination-grid"
+                id="quickDestinations"
+                role="group"
+                aria-label="Quick destinations"
+              >
+                <button
+                  class="key destination-key"
+                  data-destination="Park"
+                  aria-pressed="false"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-park" /></svg
+                  ><span>Park</span>
+                </button>
+                <button
+                  class="key destination-key"
+                  data-destination="Market"
+                  aria-pressed="false"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-market" /></svg
+                  ><span>Market</span>
+                </button>
+                <button
+                  class="key destination-key"
+                  data-destination="Bus stop"
+                  aria-pressed="false"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-bus" /></svg
+                  ><span>Bus stop</span>
+                </button>
+                <button
+                  class="key destination-key"
+                  data-destination="Pharmacy"
+                  aria-pressed="false"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-pharmacy" /></svg
+                  ><span>Pharmacy</span>
+                </button>
+              </div>
+              <div class="control-row three">
+                <button class="key primary" id="routeToggle" disabled>
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-play" /></svg
+                  ><span>Go</span></button
+                ><button class="key" id="changeDestination">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-search" /></svg
+                  ><span>Search</span></button
+                ><button class="key" id="repeatRoute">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-speaker" /></svg
+                  ><span>Repeat</span>
+                </button>
+              </div>
+            </main>
+            <main class="view" id="footpath" aria-label="Check Footpath" hidden>
+              <div
+                class="status-banner"
+                data-status="paused"
+                id="footpathStatus"
+                role="status"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-pause" /></svg
+                ><strong>Camera paused</strong>
+              </div>
+              <div class="camera-space" id="footpathCamera">
+                <svg
+                  class="street-art"
+                  viewBox="0 0 600 720"
+                  preserveAspectRatio="xMidYMid slice"
+                  role="img"
+                  aria-label="Illustrated camera placeholder, not a live camera. A simulated cat can be shown in the central warning zone."
+                >
+                  <rect width="600" height="720" fill="#cfdbd8" />
+                  <path d="M0 0h176v450L0 585Z" fill="#a0aaa3" />
+                  <path d="M0 0h52v542L0 585Z" fill="#b8c0b5" />
+                  <g fill="#667b70">
+                    <path
+                      d="M75 53h60v96H75ZM75 199h60v96H75ZM75 344h60v96H75Z"
+                    />
+                  </g>
+                  <g stroke="#b6c4b8" stroke-width="7">
+                    <path d="M105 53v96M105 199v96M105 344v96" />
+                  </g>
+                  <path d="M600 31H410v403l190 111Z" fill="#b4b5a5" />
+                  <path d="M600 49H490v368l110 49Z" fill="#c5c5b4" />
+                  <path d="M410 329h190v101H410Z" fill="#d3d0b8" />
+                  <path d="M395 319h205v34H395Z" fill="#d47758" />
+                  <path d="M425 368h50v66h-50Z" fill="#6e8175" />
+                  <path d="M492 368h92v62h-92Z" fill="#91a39a" />
+                  <path d="M176 450h234l190 270H0Z" fill="#b0b6aa" />
+                  <path
+                    d="m212 450-77 270H0l176-270ZM376 450l116 270h108L410 450Z"
+                    fill="#d9d9c6"
+                  />
+                  <g stroke="#a5aa9c" stroke-width="2">
+                    <path
+                      d="m201 490 190 0M184 551h238M167 613h298M149 677h346M290 450l-4 270"
+                    />
+                  </g>
+                  <g fill="#647b5e">
+                    <path d="M189 438v-96h9v96Z" />
+                    <circle cx="194" cy="314" r="38" />
+                    <circle cx="176" cy="333" r="25" />
+                    <circle cx="214" cy="338" r="26" />
+                  </g>
+                  <g fill="#80957b">
+                    <circle cx="354" cy="410" r="17" />
+                    <path d="M350 420h8v31h-8Z" />
+                  </g>
+                  <g
+                    class="simulated-cat"
+                    fill="#464c42"
+                    stroke="#464c42"
+                    stroke-linejoin="round"
+                  >
+                    <ellipse cx="300" cy="571" rx="39" ry="23" />
+                    <path
+                      d="M320 555v-28l10 11 16-9 2 31ZM278 581v34h10v-26m35-4v28h10v-36M265 566c-24-13-18-36-9-37"
+                      stroke-width="8"
+                      fill="none"
+                    />
+                    <circle
+                      cx="331"
+                      cy="547"
+                      r="3"
+                      fill="#e3e6cc"
+                      stroke="none"
+                    />
+                  </g>
+                </svg>
+                <div class="guide-strip"></div>
+                <div class="obstacle-box"><span>cat</span></div>
+                <div class="camera-tip" id="tiltTip">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-phone" /></svg
+                  ><span>Phone upright</span>
+                </div>
+                <div class="stage-label">ILLUSTRATED VIEW · SIMULATED</div>
+                <div class="camera-paused" id="cameraPaused">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-footpath" /></svg
+                  ><strong>Ready when you are.</strong>
+                </div>
+              </div>
+              <p class="result" id="footpathResult" aria-live="polite">
+                Start scanning to check the view.
+              </p>
+              <button class="key primary" id="scanToggle">
+                <svg class="icon" aria-hidden="true"><use href="#i-play" /></svg
+                ><span>Start Scanning</span>
+              </button>
+              <div class="control-row">
+                <button class="key" data-muse>
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-mic" /></svg
+                  >Ask Muse</button
+                ><button class="key" id="repeatFootpath">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-speaker" /></svg
+                  >Repeat
+                </button>
+              </div>
+            </main>
+            <main
+              class="view"
+              id="scene"
+              aria-label="Describe Surroundings"
+              hidden
+            >
+              <div class="camera-space">
+                <svg
+                  class="street-art"
+                  viewBox="0 0 600 720"
+                  preserveAspectRatio="xMidYMid slice"
+                  role="img"
+                  aria-label="Illustrated camera placeholder, not a live camera. A simulated cat can be shown in the central warning zone."
+                >
+                  <rect width="600" height="720" fill="#cfdbd8" />
+                  <path d="M0 0h176v450L0 585Z" fill="#a0aaa3" />
+                  <path d="M0 0h52v542L0 585Z" fill="#b8c0b5" />
+                  <g fill="#667b70">
+                    <path
+                      d="M75 53h60v96H75ZM75 199h60v96H75ZM75 344h60v96H75Z"
+                    />
+                  </g>
+                  <g stroke="#b6c4b8" stroke-width="7">
+                    <path d="M105 53v96M105 199v96M105 344v96" />
+                  </g>
+                  <path d="M600 31H410v403l190 111Z" fill="#b4b5a5" />
+                  <path d="M600 49H490v368l110 49Z" fill="#c5c5b4" />
+                  <path d="M410 329h190v101H410Z" fill="#d3d0b8" />
+                  <path d="M395 319h205v34H395Z" fill="#d47758" />
+                  <path d="M425 368h50v66h-50Z" fill="#6e8175" />
+                  <path d="M492 368h92v62h-92Z" fill="#91a39a" />
+                  <path d="M176 450h234l190 270H0Z" fill="#b0b6aa" />
+                  <path
+                    d="m212 450-77 270H0l176-270ZM376 450l116 270h108L410 450Z"
+                    fill="#d9d9c6"
+                  />
+                  <g stroke="#a5aa9c" stroke-width="2">
+                    <path
+                      d="m201 490 190 0M184 551h238M167 613h298M149 677h346M290 450l-4 270"
+                    />
+                  </g>
+                  <g fill="#647b5e">
+                    <path d="M189 438v-96h9v96Z" />
+                    <circle cx="194" cy="314" r="38" />
+                    <circle cx="176" cy="333" r="25" />
+                    <circle cx="214" cy="338" r="26" />
+                  </g>
+                  <g fill="#80957b">
+                    <circle cx="354" cy="410" r="17" />
+                    <path d="M350 420h8v31h-8Z" />
+                  </g>
+                  <g
+                    class="simulated-cat"
+                    fill="#464c42"
+                    stroke="#464c42"
+                    stroke-linejoin="round"
+                  >
+                    <ellipse cx="300" cy="571" rx="39" ry="23" />
+                    <path
+                      d="M320 555v-28l10 11 16-9 2 31ZM278 581v34h10v-26m35-4v28h10v-36M265 566c-24-13-18-36-9-37"
+                      stroke-width="8"
+                      fill="none"
+                    />
+                    <circle
+                      cx="331"
+                      cy="547"
+                      r="3"
+                      fill="#e3e6cc"
+                      stroke="none"
+                    />
+                  </g>
+                </svg>
+                <div class="stage-label">SELECTED FRAME · ILLUSTRATION</div>
+              </div>
+              <div class="scene-result">
+                <p class="micro-label" id="sceneLabel">
+                  ON REQUEST / ONE IMAGE
+                </p>
+                <p class="result" id="sceneDescription" aria-live="polite">
+                  A little context.<br />When you need it.
+                </p>
+              </div>
+              <button class="key primary" id="describeScene">
+                <svg class="icon" aria-hidden="true"><use href="#i-eye" /></svg
+                >Describe scene
+              </button>
+              <button class="key" id="replayScene" disabled>
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-speaker" /></svg
+                >Replay description
+              </button>
+            </main>
+            <main
+              class="view"
+              id="training"
+              aria-label="Learn Audio Cues"
+              hidden
+            >
+              <p class="section-label">PRACTICE WHILE STATIONARY</p>
+              <button class="key cue-key" data-cue="routine">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-navigate" /></svg
+                ><span class="cue-copy"
+                  ><strong>Direction</strong><small>One soft tone</small></span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-play" />
+                </svg>
+              </button>
+              <button class="key cue-key" data-cue="caution">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-alert" /></svg
+                ><span class="cue-copy"
+                  ><strong>Obstruction</strong
+                  ><small>Two quick tones</small></span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-play" />
+                </svg>
+              </button>
+              <button class="key cue-key" data-cue="unavailable">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-pause" /></svg
+                ><span class="cue-copy"
+                  ><strong>Unavailable</strong
+                  ><small>Three low tones</small></span
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-play" />
+                </svg>
+              </button>
+              <div class="audio-spacer"></div>
+              <div
+                class="training-feedback"
+                id="trainingFeedback"
+                role="status"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-audio" /></svg
+                ><span>Choose a sound to practice.</span>
+              </div>
+              <div class="control-row">
+                <button class="key" id="vibrateCue">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-vibrate" /></svg
+                  >Vibration</button
+                ><button class="key dark" id="stopAudio">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-stop" /></svg
+                  >Stop
+                </button>
+              </div>
+            </main>
+            <main class="view" id="settings" aria-label="Settings" hidden>
+              <div class="settings-block">
+                <div class="setting">
+                  <span class="setting-label">Text size</span>
+                  <div class="segments" role="group" aria-label="Text size">
+                    <button
+                      class="segment"
+                      data-type-size="standard"
+                      aria-pressed="true"
+                    >
+                      Standard</button
+                    ><button
+                      class="segment"
+                      data-type-size="large"
+                      aria-pressed="false"
+                    >
+                      Large
+                    </button>
+                  </div>
+                </div>
+                <div class="setting">
+                  <span class="setting-label">Contrast</span>
+                  <div
+                    class="segments"
+                    role="group"
+                    aria-label="Contrast finish"
+                  >
+                    <button
+                      class="segment"
+                      data-finish="field"
+                      aria-pressed="true"
+                    >
+                      Field</button
+                    ><button
+                      class="segment"
+                      data-finish="night"
+                      aria-pressed="false"
+                    >
+                      Night
+                    </button>
+                  </div>
+                </div>
+                <div class="setting">
+                  <span class="setting-label">Audio detail</span>
+                  <div class="segments" role="group" aria-label="Audio detail">
+                    <button
+                      class="segment"
+                      data-verbosity="brief"
+                      aria-pressed="true"
+                    >
+                      Brief</button
+                    ><button
+                      class="segment"
+                      data-verbosity="detailed"
+                      aria-pressed="false"
+                    >
+                      Detailed
+                    </button>
+                  </div>
+                </div>
+                <div class="setting">
+                  <span class="setting-label">Language preference</span>
+                  <div
+                    class="segments"
+                    role="group"
+                    aria-label="Language preference preview"
+                  >
+                    <button
+                      class="segment"
+                      data-language="en"
+                      aria-pressed="true"
+                    >
+                      English</button
+                    ><button
+                      class="segment"
+                      data-language="bn"
+                      aria-pressed="false"
+                      lang="bn"
+                    >
+                      বাংলা
+                    </button>
+                  </div>
+                </div>
+                <div class="setting setting-inline">
+                  <span class="setting-label"
+                    ><svg class="icon" aria-hidden="true">
+                      <use href="#i-speaker" /></svg
+                    >Speech preview</span
+                  ><button
+                    class="toggle"
+                    id="speechToggle"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Browser speech preview"
+                  ></button>
+                </div>
+              </div>
+              <p class="micro-label">
+                Language selection previews a preference; this HTML interface is
+                English.
+              </p>
+            </main>
+            <div class="toast" id="toast" role="status" hidden></div>
+            <div
+              class="sr-only"
+              id="announcer"
+              aria-live="polite"
+              aria-atomic="true"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dialog id="museDialog" aria-labelledby="museTitle">
+      <div class="dialog-header">
+        <svg class="icon" aria-hidden="true"><use href="#i-mic" /></svg>
+        <h2 id="museTitle">Muse</h2>
+        <button class="icon-key" data-close-dialog aria-label="Close Muse">
+          <svg class="icon" aria-hidden="true"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div class="muse-indicator">
+          <svg class="icon" aria-hidden="true"><use href="#i-mic" /></svg
+          ><span>“Hey Vision”</span>
+        </div>
+        <p>
+          Try a request. Go somewhere, check the path, or ask about the view.
+        </p>
+        <form id="museForm">
+          <label class="command-label" for="museInput">What do you need?</label
+          ><input
+            class="command-input"
+            id="museInput"
+            placeholder="Take me to the nearest hospital"
+            maxlength="240"
+            autocomplete="off"
+          /><button
+            class="key primary"
+            id="sendMuse"
+            style="width: 100%; margin-top: 12px"
+            disabled
+          >
+            <svg class="icon" aria-hidden="true"><use href="#i-send" /></svg
+            >Send
+          </button>
+        </form>
+        <div class="example-commands">
+          <button
+            class="example-command"
+            data-example="Take me to the nearest hospital"
+          >
+            Take me to the nearest hospital ↗</button
+          ><button
+            class="example-command"
+            data-example="What is in front of me?"
+          >
+            What is in front of me? ↗
+          </button>
+        </div>
+        <div class="muse-answer" id="museAnswer" hidden>
+          <span class="micro-label">EXAMPLE REPLY</span>
+          <p id="museReply" aria-live="polite"></p>
+          <button class="key" id="museReplay">
+            <svg class="icon" aria-hidden="true"><use href="#i-speaker" /></svg
+            >Replay
+          </button>
+        </div>
+        <p class="small-print">
+          Design preview: type or choose an example. No microphone, model, or
+          network connection is used.
+        </p>
+      </div>
+    </dialog>
+    <dialog id="destinationDialog" aria-labelledby="destinationTitle">
+      <div class="dialog-header">
+        <svg class="icon" aria-hidden="true"><use href="#i-search" /></svg>
+        <h2 id="destinationTitle">Where to?</h2>
+        <button
+          class="icon-key"
+          data-close-dialog
+          aria-label="Close destination search"
+        >
+          <svg class="icon" aria-hidden="true"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <form id="searchForm">
+          <label class="command-label" for="placeInput">Destination</label
+          ><input
+            class="command-input"
+            id="placeInput"
+            placeholder="Hospital or a place name"
+            maxlength="80"
+            autocomplete="off"
+          /><button
+            class="key primary"
+            id="searchPlace"
+            style="width: 100%; margin-top: 12px"
+            disabled
+          >
+            <svg class="icon" aria-hidden="true"><use href="#i-search" /></svg
+            >Find destination
+          </button>
+        </form>
+        <div
+          class="destination-grid in-dialog"
+          id="dialogDestinations"
+          role="group"
+          aria-label="Quick destinations"
+        ></div>
+        <p class="small-print">
+          Prototype: any entered place creates a labelled demo route. No real
+          places or routes are fetched.
+        </p>
+      </div>
+    </dialog>
+    <dialog id="imageDialog" aria-labelledby="imageTitle">
+      <div class="dialog-header">
+        <svg class="icon" aria-hidden="true"><use href="#i-eye" /></svg>
+        <h2 id="imageTitle">Send one image?</h2>
+        <button
+          class="icon-key"
+          data-close-dialog
+          aria-label="Cancel image analysis"
+        >
+          <svg class="icon" aria-hidden="true"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <p>
+          In the app, one selected image goes to Meta for analysis. Local
+          obstacle alerts keep working.
+        </p>
+        <p class="small-print">
+          This HTML preview sends nothing. The answer is an example.
+        </p>
+        <button class="key primary" id="confirmImage">
+          Preview description</button
+        ><button class="key flat" data-close-dialog>Cancel</button>
+      </div>
+    </dialog>
+    <script>
+      "use strict";
+      /* EDIT HERE: prototype copy, sample route and response. No network calls. */
+      const DESIGN = {
+        defaultFinish: "field",
+        route: { turnMeters: 80, totalMeters: 600, stepLength: 0.65 },
+        sceneBrief:
+          "A blue pharmacy sign is on your left. A person is near the entrance.",
+        sceneDetailed:
+          "A blue pharmacy sign is on your left, with a person near the entrance. The entrance is partly obscured; its accessibility is not verified.",
+      };
+      const SCREENS = {
+        home: ["00", "Home", "LibreVision"],
+        navigation: ["01", "Navigation", "Navigate"],
+        footpath: ["02", "Check Footpath", "Check Footpath"],
+        scene: ["03", "Surroundings", "Surroundings"],
+        training: ["04", "Audio cues", "Audio cues"],
+        settings: ["05", "Settings", "Settings"],
+      };
+      const state = {
+        screen: "home",
+        destination: null,
+        navigating: false,
+        scanning: false,
+        viewState: "clear",
+        described: false,
+        verbosity: "brief",
+        speech: true,
+        language: "en",
+        imageRequest: "scene",
+      };
+      const $ = (id) => document.getElementById(id),
+        all = (selector) => [...document.querySelectorAll(selector)];
+      const svgIcon = (name) =>
+        '<svg class="icon" aria-hidden="true"><use href="#i-' +
+        name +
+        '"/></svg>';
+      let toastTimer,
+        describeTimer,
+        audioContext,
+        audioNodes = [],
+        cueTimer;
+      // Duplicate only the external review controls for small screens, never app navigation.
+      const mobile = $("mobileTools");
+      for (const selector of [".screen-list", ".tool-group", ".review-note"])
+        all(".study " + selector).forEach((node) =>
+          mobile.appendChild(node.cloneNode(true)),
+        );
+      $("dialogDestinations").innerHTML = $("quickDestinations").innerHTML;
+      all(".cue-key>.icon:last-child").forEach((icon) =>
+        icon.classList.add("play-glyph"),
+      );
+      function announce(text) {
+        $("announcer").textContent = text;
+      }
+      function toast(text) {
+        clearTimeout(toastTimer);
+        $("toast").textContent = text;
+        $("toast").hidden = false;
+        toastTimer = setTimeout(() => {
+          $("toast").hidden = true;
+        }, 3300);
+      }
+      function finish(value) {
+        if (!["field", "night"].includes(value)) return;
+        document.documentElement.dataset.finish = value;
+        document.querySelector('meta[name="theme-color"]').content =
+          value === "night" ? "#000000" : "#e5e5df";
+        all("[data-finish]")
+          .filter((el) => el.tagName === "BUTTON")
+          .forEach((el) =>
+            el.setAttribute(
+              "aria-pressed",
+              String(el.dataset.finish === value),
+            ),
+          );
+      }
+      function textSize(value) {
+        document.documentElement.dataset.type = value;
+        document.documentElement.style.setProperty(
+          "--type-scale",
+          value === "large" ? "1.2" : "1",
+        );
+        all("[data-type-size]").forEach((el) =>
+          el.setAttribute(
+            "aria-pressed",
+            String(el.dataset.typeSize === value),
+          ),
+        );
+        announce(
+          value === "large" ? "Larger text enabled." : "Standard text enabled.",
+        );
+      }
+      function showScreen(name, { history = true, focus = true } = {}) {
+        if (!SCREENS[name]) name = "home";
+        stopCue(false);
+        state.screen = name;
+        all("main.view").forEach((el) => (el.hidden = el.id !== name));
+        all("[data-screen]").forEach((el) => {
+          if (el.classList.contains("screen-link")) {
+            if (el.dataset.screen === name)
+              el.setAttribute("aria-current", "page");
+            else el.removeAttribute("aria-current");
+          }
+        });
+        const home = name === "home";
+        $("backButton").hidden = home;
+        $("settingsButton").hidden = !home;
+        $("headerMuse").hidden = home;
+        $("appHeading").classList.toggle("brand-heading", home);
+        $("appHeading").innerHTML =
+          (home ? svgIcon("brand") : "") +
+          "<span>" +
+          SCREENS[name][2] +
+          "</span>";
+        $("screenCaption").textContent =
+          SCREENS[name][0] + " / " + SCREENS[name][1];
+        all(".demo-tools").forEach(
+          (el) => (el.hidden = !["navigation", "footpath"].includes(name)),
+        );
+        if (name === "navigation") updateNavigation();
+        if (name === "footpath") updateFootpath();
+        const tools = document.querySelector(".mobile-tools");
+        if (tools) tools.open = false;
+        if (history && location.hash !== "#" + name)
+          window.history.pushState(null, "", "#" + name);
+        if (focus) $("appHeading").focus({ preventScroll: true });
+      }
+      function setBanner(id, status, word, icon) {
+        const banner = $(id);
+        banner.dataset.status = status;
+        banner.innerHTML = svgIcon(icon) + "<strong>" + word + "</strong>";
+      }
+      function viewBanner(id) {
+        if (!state.scanning) {
+          setBanner(id, "paused", "Camera paused", "pause");
+          return;
+        }
+        if (state.viewState === "obstacle") {
+          setBanner(id, "obstacle", "Unsafe", "alert");
+          return;
+        }
+        if (state.viewState === "tilt") {
+          setBanner(id, "uncertain", "View uncertain", "phone");
+          return;
+        }
+        setBanner(id, "clear", "No obstruction", "check");
+      }
+      function updateFootpath() {
+        $("app").dataset.viewState = state.viewState;
+        viewBanner("footpathStatus");
+        viewBanner("navStatus");
+        $("cameraPaused").hidden = state.scanning;
+        $("tiltTip").hidden = !state.scanning;
+        $("tiltTip").innerHTML =
+          svgIcon("phone") +
+          "<span>" +
+          (state.viewState === "tilt"
+            ? "Keep phone upright"
+            : "Phone upright") +
+          "</span>";
+        $("footpathResult").textContent = !state.scanning
+          ? "Start scanning to check the view."
+          : state.viewState === "obstacle"
+            ? "Example: Stop, cat about 2 steps away."
+            : state.viewState === "tilt"
+              ? "Hold the phone upright for a clearer view."
+              : "No obstruction reported. Path safety is not verified.";
+        $("scanToggle").classList.toggle("primary", !state.scanning);
+        $("scanToggle").classList.toggle("dark", state.scanning);
+        $("scanToggle").innerHTML =
+          svgIcon(state.scanning ? "stop" : "play") +
+          "<span>" +
+          (state.scanning ? "Stop Scanning" : "Start Scanning") +
+          "</span>";
+      }
+      function scanning(enabled) {
+        state.scanning = enabled;
+        updateFootpath();
+        announce(
+          enabled
+            ? "Simulated scanning started. No live camera is used."
+            : "Scanning preview stopped.",
+        );
+      }
+      function demoState(value) {
+        state.viewState = value;
+        if (!state.scanning) scanning(true);
+        updateFootpath();
+        if (state.screen === "navigation") updateNavigation();
+        all("[data-demo-state]").forEach((el) =>
+          el.setAttribute(
+            "aria-pressed",
+            String(el.dataset.demoState === value),
+          ),
+        );
+        announce("Simulated state: " + value);
+      }
+      function selectDestination(value) {
+        state.destination = value;
+        state.navigating = false;
+        all("[data-destination]").forEach((el) =>
+          el.setAttribute(
+            "aria-pressed",
+            String(el.dataset.destination === value),
+          ),
+        );
+        updateNavigation();
+        announce(value + " selected. Demo destination.");
+      }
+      function updateNavigation() {
+        $("app").dataset.route = state.navigating ? "active" : "idle";
+        viewBanner("navStatus");
+        $("quickDestinations").hidden = state.navigating;
+        $("routeToggle").disabled = !state.destination;
+        $("routeToggle").classList.toggle("primary", !state.navigating);
+        $("routeToggle").classList.toggle("dark", state.navigating);
+        $("routeToggle").innerHTML =
+          svgIcon(state.navigating ? "stop" : "play") +
+          "<span>" +
+          (state.navigating ? "Stop" : "Go") +
+          "</span>";
+        $("changeDestination").innerHTML =
+          svgIcon("search") +
+          "<span>" +
+          (state.navigating ? "Change" : "Search") +
+          "</span>";
+        $("navManeuver").firstElementChild.innerHTML =
+          '<use href="#i-' + (state.navigating ? "left" : "navigate") + '"/>';
+        $("navInstruction").textContent = state.navigating
+          ? "Left in " + DESIGN.route.turnMeters + " m"
+          : state.destination || "Where to?";
+        $("navDistance").textContent = state.navigating
+          ? "~" +
+            Math.round(DESIGN.route.turnMeters / DESIGN.route.stepLength) +
+            " steps · Total " +
+            DESIGN.route.totalMeters +
+            " m / ~" +
+            Math.round(DESIGN.route.totalMeters / DESIGN.route.stepLength) +
+            " steps"
+          : "Choose " +
+            (state.destination
+              ? "Go to preview the route."
+              : "a destination below.");
+        if (state.navigating && state.viewState === "obstacle") {
+          $("navInstruction").textContent = "Stop, cat ahead";
+          $("navDistance").textContent =
+            "Example alert · about 2 steps away. Depth is estimated.";
+          $("navManeuver").firstElementChild.innerHTML =
+            '<use href="#i-alert"/>';
+        }
+      }
+      function startNavigation() {
+        if (!state.destination) {
+          $("destinationDialog").showModal();
+          return;
+        }
+        state.navigating = true;
+        scanning(true);
+        updateNavigation();
+        announce(
+          "Demo route started to " +
+            state.destination +
+            ". No live navigation or GPS.",
+        );
+      }
+      function stopNavigation() {
+        state.navigating = false;
+        updateNavigation();
+        announce("Demo navigation stopped.");
+      }
+      function openMuse() {
+        $("museDialog").showModal();
+        $("museInput").focus();
+      }
+      function closeDialog(dialog) {
+        if (dialog?.open) dialog.close();
+      }
+      function requestImage(source = "scene") {
+        state.imageRequest = source;
+        $("imageDialog").showModal();
+      }
+      function speak(text) {
+        if (!state.speech) {
+          toast("Speech preview is off. Enable it in Settings.");
+          return;
+        }
+        if (!("speechSynthesis" in window)) {
+          toast("Speech preview is unavailable in this browser.");
+          return;
+        }
+        window.speechSynthesis.cancel();
+        const message = new SpeechSynthesisUtterance("Design preview. " + text);
+        const voices = window.speechSynthesis.getVoices();
+        const voice =
+          voices.find(
+            (v) => v.localService && v.default && v.lang.startsWith("en"),
+          ) || voices.find((v) => v.localService && v.lang.startsWith("en"));
+        if (!voice) {
+          toast(
+            "No local English browser voice is available. The written preview remains available.",
+          );
+          return;
+        }
+        message.voice = voice;
+        message.rate = 1;
+        window.speechSynthesis.speak(message);
+        toast("Playing browser speech preview.");
+      }
+      function stopCue(feedback = true) {
+        clearTimeout(cueTimer);
+        audioNodes.forEach((node) => {
+          try {
+            node.stop();
+          } catch {}
+        });
+        audioNodes = [];
+        all("[data-cue]").forEach((el) =>
+          el.setAttribute("aria-pressed", "false"),
+        );
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        navigator.vibrate?.(0);
+        if (feedback)
+          $("trainingFeedback").innerHTML =
+            svgIcon("stop") + "<span>Sound and vibration stopped.</span>";
+      }
+      async function playCue(kind) {
+        stopCue(false);
+        const config = {
+          routine: [660, 1, 0.17, "Direction · one soft tone."],
+          caution: [840, 2, 0.13, "Obstruction · two quick tones."],
+          unavailable: [260, 3, 0.21, "Unavailable · three low tones."],
+        }[kind];
+        if (!config) return;
+        try {
+          const Constructor = window.AudioContext || window.webkitAudioContext;
+          if (!Constructor) throw Error("unsupported");
+          audioContext ??= new Constructor();
+          await audioContext.resume();
+          const start = audioContext.currentTime;
+          for (let i = 0; i < config[1]; i++) {
+            const oscillator = audioContext.createOscillator(),
+              gain = audioContext.createGain(),
+              t = start + i * (config[2] + 0.15);
+            oscillator.type = "sine";
+            oscillator.frequency.value = config[0];
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(0.12, t + 0.018);
+            gain.gain.setValueAtTime(0.12, t + config[2] - 0.03);
+            gain.gain.linearRampToValueAtTime(0, t + config[2]);
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            oscillator.start(t);
+            oscillator.stop(t + config[2] + 0.01);
+            audioNodes.push(oscillator);
+          }
+          all("[data-cue]").forEach((el) =>
+            el.setAttribute("aria-pressed", String(el.dataset.cue === kind)),
+          );
+          $("trainingFeedback").innerHTML =
+            svgIcon("speaker") + "<span>" + config[3] + "</span>";
+          announce(config[3]);
+          cueTimer = setTimeout(
+            () =>
+              all("[data-cue]").forEach((el) =>
+                el.setAttribute("aria-pressed", "false"),
+              ),
+            config[1] * (config[2] + 0.15) * 1000,
+          );
+        } catch {
+          toast("Audio is unavailable here. Cue labels show each pattern.");
+        }
+      }
+      function museRequest(query) {
+        const text = query
+          .trim()
+          .replace(/^hey\s+(?:muse|mews|moose|news)[,.!?\s]*/i, "")
+          .toLowerCase();
+        if (!text) return;
+        if (/(?:stop|end|cancel)\s+(?:the\s+)?scan/.test(text)) {
+          scanning(false);
+          closeDialog($("museDialog"));
+          showScreen("footpath");
+          return;
+        }
+        if (
+          /(?:start|begin)\s+(?:the\s+)?scan|check (?:the )?(?:footpath|path)/.test(
+            text,
+          )
+        ) {
+          closeDialog($("museDialog"));
+          showScreen("footpath");
+          scanning(true);
+          return;
+        }
+        if (/stop (?:the )?(?:navigation|route)/.test(text)) {
+          stopNavigation();
+          closeDialog($("museDialog"));
+          showScreen("navigation");
+          return;
+        }
+        const destination = /hospital/.test(text)
+          ? "Hospital"
+          : /pharmacy/.test(text)
+            ? "Pharmacy"
+            : /park/.test(text)
+              ? "Park"
+              : /market/.test(text)
+                ? "Market"
+                : /bus stop/.test(text)
+                  ? "Bus stop"
+                  : null;
+        if (destination) {
+          closeDialog($("museDialog"));
+          showScreen("navigation");
+          selectDestination(destination);
+          startNavigation();
+          toast("Demo route to " + destination + ". No live navigation.");
+          return;
+        }
+        if (/(?:view|front|surround|describe|ahead|see)/.test(text)) {
+          closeDialog($("museDialog"));
+          requestImage("muse");
+          return;
+        }
+        if (/settings/.test(text)) {
+          closeDialog($("museDialog"));
+          showScreen("settings");
+          return;
+        }
+        if (/large|bigger/.test(text)) {
+          textSize("large");
+          $("museReply").textContent = "Text size increased for this preview.";
+        } else {
+          $("museReply").textContent =
+            "This is a design preview. In the app, Muse can answer your question or request an implemented app action.";
+        }
+        $("museAnswer").hidden = false;
+        announce($("museReply").textContent);
+      }
+      // One delegated handler keeps the HTML easy to edit without per-element wiring.
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button || button.disabled) return;
+        if (button.dataset.screen) {
+          showScreen(button.dataset.screen);
+          return;
+        }
+        if (button.hasAttribute("data-finish")) {
+          finish(button.dataset.finish);
+          return;
+        }
+        if (button.dataset.demoState) {
+          demoState(button.dataset.demoState);
+          return;
+        }
+        if (button.hasAttribute("data-muse")) {
+          openMuse();
+          return;
+        }
+        if (button.hasAttribute("data-close-dialog")) {
+          closeDialog(button.closest("dialog"));
+          return;
+        }
+        if (button.dataset.destination) {
+          selectDestination(button.dataset.destination);
+          closeDialog(button.closest("dialog"));
+          if (state.screen !== "navigation") showScreen("navigation");
+          return;
+        }
+        if (button.dataset.typeSize) {
+          textSize(button.dataset.typeSize);
+          return;
+        }
+        if (button.dataset.verbosity) {
+          state.verbosity = button.dataset.verbosity;
+          all("[data-verbosity]").forEach((el) =>
+            el.setAttribute(
+              "aria-pressed",
+              String(el.dataset.verbosity === state.verbosity),
+            ),
+          );
+          if (state.described)
+            $("sceneDescription").textContent =
+              state.verbosity === "brief"
+                ? DESIGN.sceneBrief
+                : DESIGN.sceneDetailed;
+          return;
+        }
+        if (button.dataset.language) {
+          state.language = button.dataset.language;
+          all("[data-language]").forEach((el) =>
+            el.setAttribute(
+              "aria-pressed",
+              String(el.dataset.language === state.language),
+            ),
+          );
+          toast(
+            "Language preference preview: " +
+              (state.language === "en" ? "English" : "বাংলা") +
+              ". Interface remains English.",
+          );
+          return;
+        }
+        if (button.dataset.cue) {
+          playCue(button.dataset.cue);
+          return;
+        }
+        if (button.dataset.example) {
+          $("museInput").value = button.dataset.example;
+          $("sendMuse").disabled = false;
+          museRequest(button.dataset.example);
+          return;
+        }
+        switch (button.id) {
+          case "scanToggle":
+            scanning(!state.scanning);
+            break;
+          case "routeToggle":
+            state.navigating ? stopNavigation() : startNavigation();
+            break;
+          case "changeDestination":
+            $("destinationDialog").showModal();
+            break;
+          case "centerMap":
+            toast("Demo map is already centered. No live GPS is connected.");
+            break;
+          case "repeatRoute":
+            speak(
+              state.navigating
+                ? "Demo route to " +
+                    state.destination +
+                    ". Turn left in " +
+                    DESIGN.route.turnMeters +
+                    " metres, about " +
+                    Math.round(
+                      DESIGN.route.turnMeters / DESIGN.route.stepLength,
+                    ) +
+                    " steps. Total route " +
+                    DESIGN.route.totalMeters +
+                    " metres, about " +
+                    Math.round(
+                      DESIGN.route.totalMeters / DESIGN.route.stepLength,
+                    ) +
+                    " steps."
+                : "Choose a destination to preview a route.",
+            );
+            break;
+          case "repeatFootpath":
+            speak($("footpathResult").textContent);
+            break;
+          case "describeScene":
+            requestImage("scene");
+            break;
+          case "confirmImage":
+            closeDialog($("imageDialog"));
+            state.described = true;
+            const description =
+              state.verbosity === "brief"
+                ? DESIGN.sceneBrief
+                : DESIGN.sceneDetailed;
+            $("sceneLabel").textContent = "EXAMPLE DESCRIPTION";
+            $("sceneDescription").textContent = description;
+            $("replayScene").disabled = false;
+            if (state.imageRequest === "muse") {
+              $("museReply").textContent = description;
+              $("museAnswer").hidden = false;
+              $("museDialog").showModal();
+            } else showScreen("scene");
+            announce("Example description: " + description);
+            break;
+          case "replayScene":
+            speak($("sceneDescription").textContent);
+            break;
+          case "museReplay":
+            speak($("museReply").textContent);
+            break;
+          case "stopAudio":
+            stopCue();
+            break;
+          case "vibrateCue":
+            if (navigator.vibrate?.([100, 100, 100])) {
+              $("trainingFeedback").innerHTML =
+                svgIcon("vibrate") +
+                "<span>Vibration · two short pulses.</span>";
+              announce("Vibration preview: two pulses.");
+            } else toast("Vibration preview is unavailable in this browser.");
+            break;
+          case "speechToggle":
+            state.speech = !state.speech;
+            button.setAttribute("aria-checked", String(state.speech));
+            if (!state.speech) window.speechSynthesis?.cancel();
+            break;
+        }
+      });
+      $("museInput").addEventListener("input", () => {
+        $("sendMuse").disabled = !$("museInput").value.trim();
+      });
+      $("museForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        museRequest($("museInput").value);
+      });
+      $("placeInput").addEventListener("input", () => {
+        $("searchPlace").disabled = !$("placeInput").value.trim();
+      });
+      $("searchForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const query = $("placeInput").value.trim();
+        if (!query) return;
+        selectDestination(query);
+        closeDialog($("destinationDialog"));
+        showScreen("navigation");
+        toast("Demo destination selected: " + query);
+      });
+      all("dialog").forEach((dialog) => {
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) {
+            const b = dialog.getBoundingClientRect();
+            if (
+              event.clientX < b.left ||
+              event.clientX > b.right ||
+              event.clientY < b.top ||
+              event.clientY > b.bottom
+            )
+              dialog.close();
+          }
+        });
+      });
+      // The small camera can be moved with touch, mouse or arrow keys.
+      const handle = $("cameraHandle"),
+        overlay = $("cameraOverlay");
+      let drag = null;
+      function moveCamera(dx, dy) {
+        const stage = $("mapStage").getBoundingClientRect(),
+          box = overlay.getBoundingClientRect();
+        const previousX = Number(overlay.dataset.dx || 0),
+          previousY = Number(overlay.dataset.dy || 0);
+        const nextX =
+          previousX +
+          Math.max(
+            stage.left + 4 - box.left,
+            Math.min(dx, stage.right - 4 - box.right),
+          );
+        const nextY =
+          previousY +
+          Math.max(
+            stage.top + 4 - box.top,
+            Math.min(dy, stage.bottom - 4 - box.bottom),
+          );
+        overlay.dataset.dx = nextX;
+        overlay.dataset.dy = nextY;
+        overlay.style.transform = "translate(" + nextX + "px," + nextY + "px)";
+      }
+      overlay.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        drag = { x: event.clientX, y: event.clientY };
+        overlay.setPointerCapture(event.pointerId);
+      });
+      overlay.addEventListener("pointermove", (event) => {
+        if (!drag) return;
+        moveCamera(event.clientX - drag.x, event.clientY - drag.y);
+        drag = { x: event.clientX, y: event.clientY };
+      });
+      overlay.addEventListener("pointerup", () => {
+        drag = null;
+      });
+      overlay.addEventListener("pointercancel", () => {
+        drag = null;
+      });
+      handle.addEventListener("keydown", (event) => {
+        const direction = {
+          ArrowLeft: [-24, 0],
+          ArrowRight: [24, 0],
+          ArrowUp: [0, -24],
+          ArrowDown: [0, 24],
+        }[event.key];
+        if (direction) {
+          event.preventDefault();
+          moveCamera(...direction);
+        }
+      });
+      window.addEventListener("popstate", () =>
+        showScreen(location.hash.slice(1), { history: false }),
+      );
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stopCue(false);
+      });
+      finish(DESIGN.defaultFinish);
+      updateFootpath();
+      showScreen(location.hash.slice(1) || "home", {
+        history: false,
+        focus: false,
+      });
+    </script>
+  </body>
+</html>

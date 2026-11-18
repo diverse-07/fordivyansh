@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "librevision-navigation-gateway",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "vars": { "LOCAL_ONLY": "false", "APP_ACCESS": "public" },
+  "ratelimits": [
+    {
+      "name": "CLIENT_LIMITER",
+      "namespace_id": "2001",
+      "simple": { "limit": 12, "period": 60 },
+    },
+    {
+      "name": "GLOBAL_LIMITER",
+      "namespace_id": "2002",
+      "simple": { "limit": 36, "period": 60 },
+    },
+  ],
+}

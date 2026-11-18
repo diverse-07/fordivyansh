@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.NetraSaathi" parent="Theme.NetraSaathi.Base">
+        <item name="android:windowSplashScreenBackground">#0A0E17</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/netra_saathi_icon</item>
+    </style>
+</resources>

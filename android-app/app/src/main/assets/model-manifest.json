@@ -1,0 +1,21 @@
+{
+  "repository": "litert-community/RF-DETR-Nano-LiteRT",
+  "revision": "388a9bb69eefac2efff19d5bb92cea49b7379a5a",
+  "files": [
+    {
+      "name": "demo.jpg",
+      "bytes": 252035,
+      "sha256": "0e6cbec7726cda5f7a1e3454a4de313b441df152c91c607e017141324d01d5e9"
+    },
+    {
+      "name": "rfdetr_graphA_fp16.tflite",
+      "bytes": 48634176,
+      "sha256": "de71a9c0c3fb2e1c617f3a79b2ce3541ea33b7ceb9bd5e7edd752b067efe33a1"
+    },
+    {
+      "name": "rfdetr_graphB_fp16.tflite",
+      "bytes": 7594960,
+      "sha256": "ced9a6b29f8196c6d66c9864a11f4fd2d7e23bb5ab2d0d83f49101f85321fc86"
+    }
+  ]
+}

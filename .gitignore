@@ -1,0 +1,71 @@
+# Root .gitignore for Netra Saathi Monorepo
+
+# Environment variables & secrets (CRITICAL)
+.env
+*.env
+!.env.example
+**/.env
+**/*.env
+!**/.env.example
+*.pem
+*.key
+*.keystore
+*.jks
+
+# Android & Gradle
+.gradle/
+**/.gradle/
+build/
+**/build/
+.kotlin/
+**/.kotlin/
+local.properties
+**/local.properties
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+*.hprof
+.cxx/
+**/.cxx/
+
+# Node & Next.js
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+**/out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE & OS
+.idea/
+**/.idea/
+*.iml
+**/*.iml
+.vscode/
+**/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Submodule backups
+*.git_backup/
+**/*.git_backup/

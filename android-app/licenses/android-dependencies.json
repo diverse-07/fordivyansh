@@ -1,0 +1,2338 @@
+{
+  "description": "Resolved Android runtime and JVM test dependency credits; licenses reported by upstream Maven POM metadata. Nested native components retain their own notices.",
+  "configurations": ["debugRuntimeClasspath", "debugUnitTestRuntimeClasspath"],
+  "dependencies": [
+    {
+      "coordinate": "androidx.activity:activity-compose:1.10.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.activity:activity-ktx:1.10.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.activity:activity:1.10.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.annotation:annotation-experimental:1.4.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.annotation:annotation-jvm:1.9.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/annotation/annotation-jvm/1.9.1/annotation-jvm-1.9.1.pom"
+    },
+    {
+      "coordinate": "androidx.annotation:annotation:1.9.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.appcompat:appcompat-resources:1.1.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/appcompat/appcompat-resources/1.1.0/appcompat-resources-1.1.0.pom"
+    },
+    {
+      "coordinate": "androidx.appcompat:appcompat:1.1.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/appcompat/appcompat/1.1.0/appcompat-1.1.0.pom"
+    },
+    {
+      "coordinate": "androidx.arch.core:core-common:2.2.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/arch/core/core-common/2.2.0/core-common-2.2.0.pom"
+    },
+    {
+      "coordinate": "androidx.arch.core:core-runtime:2.2.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/arch/core/core-runtime/2.2.0/core-runtime-2.2.0.pom"
+    },
+    {
+      "coordinate": "androidx.autofill:autofill:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "http://source.android.com"
+    },
+    {
+      "coordinate": "androidx.camera.featurecombinationquery:featurecombinationquery:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera.viewfinder:viewfinder-core:1.5.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera:camera-camera2-pipe:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera:camera-camera2:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera:camera-core:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        },
+        {
+          "name": "BSD-3-Clause",
+          "url": "https://opensource.org/licenses/BSD-3-Clause"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera:camera-lifecycle:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera:camera-video:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.camera:camera-view:1.6.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.collection:collection-jvm:1.5.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.collection:collection-ktx:1.5.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.collection:collection:1.5.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.animation:animation-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.animation:animation-core-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.animation:animation-core:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.animation:animation:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.foundation:foundation-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.foundation:foundation-layout-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.foundation:foundation-layout:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.foundation:foundation:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material3:material3-android:1.3.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material3:material3:1.3.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material:material-icons-core-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material:material-icons-core:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material:material-icons-extended-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material:material-icons-extended:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material:material-ripple-android:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.material:material-ripple:1.7.6",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.runtime:runtime-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.runtime:runtime-annotation-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.runtime:runtime-annotation:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.runtime:runtime-saveable-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.runtime:runtime-saveable:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.runtime:runtime:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-geometry-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-geometry:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-graphics-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-graphics:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-text-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-text:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-unit-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-unit:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-util-android:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui-util:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose.ui:ui:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.compose:compose-bom:2024.12.01",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://developer.android.com/jetpack"
+    },
+    {
+      "coordinate": "androidx.concurrent:concurrent-futures-ktx:1.1.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "http://source.android.com"
+    },
+    {
+      "coordinate": "androidx.concurrent:concurrent-futures:1.1.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/concurrent/concurrent-futures/1.1.0/concurrent-futures-1.1.0.pom"
+    },
+    {
+      "coordinate": "androidx.core:core-backported-fixes:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.core:core-ktx:1.15.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.core:core-viewtree:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.core:core:1.15.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.cursoradapter:cursoradapter:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/cursoradapter/cursoradapter/1.0.0/cursoradapter-1.0.0.pom"
+    },
+    {
+      "coordinate": "androidx.customview:customview-poolingcontainer:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.customview:customview:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/customview/customview/1.0.0/customview-1.0.0.pom"
+    },
+    {
+      "coordinate": "androidx.drawerlayout:drawerlayout:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/drawerlayout/drawerlayout/1.0.0/drawerlayout-1.0.0.pom"
+    },
+    {
+      "coordinate": "androidx.emoji2:emoji2:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.exifinterface:exifinterface:1.4.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.fragment:fragment:1.8.9",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.graphics:graphics-path:1.0.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.interpolator:interpolator:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/interpolator/interpolator/1.0.0/interpolator-1.0.0.pom"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common-java8:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common-jvm:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core-ktx:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-process:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-android:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-compose-android:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-compose:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-ktx-android:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-ktx:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-service:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-android:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-compose-android:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.10.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.loader:loader:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/loader/loader/1.0.0/loader-1.0.0.pom"
+    },
+    {
+      "coordinate": "androidx.media3:media3-common:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/androidx/media"
+    },
+    {
+      "coordinate": "androidx.media3:media3-container:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/androidx/media"
+    },
+    {
+      "coordinate": "androidx.media3:media3-muxer:1.9.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/androidx/media"
+    },
+    {
+      "coordinate": "androidx.profileinstaller:profileinstaller:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.room:room-common:2.5.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.room:room-ktx:2.5.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.room:room-runtime:2.5.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate-android:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate-compose-android:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate-compose:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate-ktx:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate:1.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.sqlite:sqlite-framework:2.3.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.sqlite:sqlite:2.3.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.startup:startup-runtime:1.1.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/startup/startup-runtime/1.1.1/startup-runtime-1.1.1.pom"
+    },
+    {
+      "coordinate": "androidx.tracing:tracing-android:1.3.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.tracing:tracing-ktx:1.3.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.tracing:tracing:1.3.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "androidx.vectordrawable:vectordrawable-animated:1.1.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/vectordrawable/vectordrawable-animated/1.1.0/vectordrawable-animated-1.1.0.pom"
+    },
+    {
+      "coordinate": "androidx.vectordrawable:vectordrawable:1.1.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/vectordrawable/vectordrawable/1.1.0/vectordrawable-1.1.0.pom"
+    },
+    {
+      "coordinate": "androidx.versionedparcelable:versionedparcelable:1.1.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/versionedparcelable/versionedparcelable/1.1.1/versionedparcelable-1.1.1.pom"
+    },
+    {
+      "coordinate": "androidx.viewpager:viewpager:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://dl.google.com/dl/android/maven2/androidx/viewpager/viewpager/1.0.0/viewpager-1.0.0.pom"
+    },
+    {
+      "coordinate": "androidx.work:work-runtime:2.9.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://cs.android.com/androidx/platform/frameworks/support"
+    },
+    {
+      "coordinate": "com.alphacephei:vosk-android:0.3.75",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/alphacep/vosk-api/"
+    },
+    {
+      "coordinate": "com.google.ai.edge.litert:litert-api:2.3.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://ai.google.dev/edge/litert"
+    },
+    {
+      "coordinate": "com.google.ai.edge.litert:litert-gpu:2.3.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://ai.google.dev/edge/litert"
+    },
+    {
+      "coordinate": "com.google.ai.edge.litert:litert:2.3.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://ai.google.dev/edge/litert"
+    },
+    {
+      "coordinate": "com.google.android.gms:play-services-basement:18.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Android Software Development Kit License",
+          "url": "https://developer.android.com/studio/terms.html"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.gms:play-services-tasks:18.2.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Android Software Development Kit License",
+          "url": "https://developer.android.com/studio/terms.html"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.play:ai-delivery:0.1.1-alpha01",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Play Core Software Development Kit Terms of Service",
+          "url": "https://developer.android.com/guide/playcore/license"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.play:asset-delivery:2.3.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Play Core Software Development Kit Terms of Service",
+          "url": "https://developer.android.com/guide/playcore/license"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.play:core-common:2.0.4",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Play Core Software Development Kit Terms of Service",
+          "url": "https://developer.android.com/guide/playcore/license"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.auto.value:auto-value-annotations:1.6.3",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "http://github.com/google/auto",
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/com/google/auto/auto-parent/7/auto-parent-7.pom"
+    },
+    {
+      "coordinate": "com.google.code.gson:gson:2.10.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.dagger:dagger:2.59",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/google/dagger/"
+    },
+    {
+      "coordinate": "com.google.errorprone:error_prone_annotations:2.41.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.guava:failureaccess:1.0.3",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/com/google/guava/guava-parent/33.4.0-android/guava-parent-33.4.0-android.pom"
+    },
+    {
+      "coordinate": "com.google.guava:guava:33.5.0-android",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/google/guava",
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/com/google/guava/guava-parent/33.5.0-android/guava-parent-33.5.0-android.pom"
+    },
+    {
+      "coordinate": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/com/google/guava/guava-parent/26.0-android/guava-parent-26.0-android.pom"
+    },
+    {
+      "coordinate": "com.google.j2objc:j2objc-annotations:3.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "http://github.com/google/j2objc"
+    },
+    {
+      "coordinate": "com.jakewharton.timber:timber:5.0.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/JakeWharton/timber"
+    },
+    {
+      "coordinate": "com.microsoft.onnxruntime:onnxruntime-android:1.24.3",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "MIT License",
+          "url": "https://opensource.org/licenses/MIT"
+        }
+      ],
+      "upstream": "http://github.com/microsoft/onnxruntime"
+    },
+    {
+      "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/square/okhttp"
+    },
+    {
+      "coordinate": "com.squareup.okio:okio-jvm:3.6.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/square/okio/"
+    },
+    {
+      "coordinate": "com.squareup.okio:okio:3.6.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/square/okio/"
+    },
+    {
+      "coordinate": "jakarta.inject:jakarta.inject-api:2.0.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/eclipse-ee4j/injection-api"
+    },
+    {
+      "coordinate": "javax.inject:javax.inject:1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.pom"
+    },
+    {
+      "coordinate": "junit:junit:4.13.2",
+      "configurations": ["debugUnitTestRuntimeClasspath"],
+      "licenses": [
+        {
+          "name": "Eclipse Public License 1.0",
+          "url": "http://www.eclipse.org/legal/epl-v10.html"
+        }
+      ],
+      "upstream": "https://github.com/junit-team/junit4"
+    },
+    {
+      "coordinate": "net.java.dev.jna:jna:5.18.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "LGPL-2.1-or-later",
+          "url": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1"
+        },
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/java-native-access/jna"
+    },
+    {
+      "coordinate": "org.hamcrest:hamcrest-core:1.3",
+      "configurations": ["debugUnitTestRuntimeClasspath"],
+      "licenses": [
+        {
+          "name": "New BSD License",
+          "url": "http://www.opensource.org/licenses/bsd-license.php"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-parent/1.3/hamcrest-parent-1.3.pom"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-bom:1.8.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/JetBrains/kotlin"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-common:2.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/2.4.0/kotlin-stdlib-common-2.4.0.pom"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/JetBrains/kotlin"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/JetBrains/kotlin"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.4.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.0/kotlin-stdlib-2.4.0.pom"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:atomicfu-jvm:0.28.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.atomicfu"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:atomicfu:0.28.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.atomicfu"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.coroutines"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.coroutines"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.coroutines"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.coroutines"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.coroutines"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.7.3",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.serialization"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.7.3",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.serialization"
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/Kotlin/kotlinx.serialization"
+    },
+    {
+      "coordinate": "org.jetbrains:annotations:23.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/23.0.0/annotations-23.0.0.pom"
+    },
+    {
+      "coordinate": "org.json:json:20240303",
+      "configurations": ["debugUnitTestRuntimeClasspath"],
+      "licenses": [
+        {
+          "name": "Public Domain",
+          "url": "https://github.com/stleary/JSON-java/blob/master/LICENSE"
+        }
+      ],
+      "upstream": "https://github.com/douglascrockford/JSON-java.git"
+    },
+    {
+      "coordinate": "org.jspecify:jspecify:1.0.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "licenseMetadataSource": "https://repo.maven.apache.org/maven2/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.pom"
+    },
+    {
+      "coordinate": "org.maplibre.gl:android-sdk-geojson:6.0.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/maplibre/maplibre-java"
+    },
+    {
+      "coordinate": "org.maplibre.gl:android-sdk-turf:6.0.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "upstream": "https://github.com/maplibre/maplibre-java"
+    },
+    {
+      "coordinate": "org.maplibre.gl:android-sdk:13.7.1",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "BSD",
+          "url": "https://opensource.org/licenses/BSD-2-Clause"
+        }
+      ],
+      "upstream": "https://github.com/maplibre/maplibre-native"
+    },
+    {
+      "coordinate": "org.maplibre.gl:maplibre-android-gestures:0.0.4",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "BSD",
+          "url": "https://opensource.org/licenses/BSD-2-Clause"
+        }
+      ],
+      "upstream": "https://github.com/maplibre/maplibre-gestures-android"
+    },
+    {
+      "coordinate": "org.opencv:opencv:4.13.0",
+      "configurations": [
+        "debugRuntimeClasspath",
+        "debugUnitTestRuntimeClasspath"
+      ],
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://github.com/opencv/opencv/blob/master/LICENSE"
+        }
+      ],
+      "upstream": "https://github.com/opencv/opencv"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+# Local development notes, prompts and reports
+/local-notes/
+/prompts/
+/.agents/
+/.codex/
+*.[mM][dD]
+![Rr][Ee][Aa][Dd][Mm][Ee].[mM][dD]
+*.[pP][rR][oO][mM][pP][tT]
+*.[pP][rR][oO][mM][pP][tT].*
+*[Pp][Rr][Oo][Mm][Pp][Tt]*.[tT][xX][tT]
+
+# Build output and local Android/IDE configuration (also covers build symlinks)
+**/build
+.gradle/
+.kotlin/
+.idea/
+*.iml
+local.properties
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.hprof
+
+# Local credentials and signing material
+.env*
+.dev.vars*
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Dependencies and Worker runtime state
+**/node_modules/
+**/.wrangler/
+
+# Local test results, device captures and rendered design previews
+/verification/
+/design/previews/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local release staging
+/release-output/
+
+# Python helper bytecode
+__pycache__/
+*.py[cod]
