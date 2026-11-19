@@ -21,10 +21,10 @@ function wave(samples = 16000) {
   result.writeUInt32LE(samples * 2, 40);
   return result;
 }
-const request = (data) =>
+const request = (data, contentType = "application/vnd.netrasaathi.wav+gzip") =>
   new Request("http://127.0.0.1/transcribe", {
     method: "POST",
-    headers: { "Content-Type": "application/vnd.librevision.wav+gzip" },
+    headers: { "Content-Type": contentType },
     body: data,
   });
 test("decompresses one utterance and uses only documented fixed Meta voice fields", async () => {
@@ -55,6 +55,11 @@ test("decompresses one utterance and uses only documented fixed Meta voice field
   assert.equal(data.text, "Navigate to Square Hospital.");
   assert.equal(data.model, "muse-voice-transcribe-1.0");
   assert.equal(data.audioDurationMs, 1000);
+});
+test("older LibreVision clients can still send the same WAV format", async () => {
+  const handler = createHandler(() => Response.json({ transcript: "Open Settings." }));
+  const result = await handler(request(gzipSync(wave()), "application/vnd.librevision.wav+gzip"), env);
+  assert.equal(result.status, 200);
 });
 test("rejects corrupt, oversized, non-mono, wrong-rate and non-PCM input before paid work", async () => {
   const handler = createHandler(() => {

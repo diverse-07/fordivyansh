@@ -27,11 +27,11 @@ class SurroundingsTest {
 
     @Test
     fun framesSpanAllChunksWithoutAssumingAnglesOrCoverage() {
-        val offsets = VideoFramePlan.offsets(12000)
+        val offsets = VideoFramePlan.offsets(VideoFramePlan.AUTO_CAPTURE_MS)
         assertEquals(12, offsets.size)
-        assertEquals(500L, offsets.first())
-        assertEquals(11500L, offsets.last())
-        assertTrue(offsets.zipWithNext().all { (a, b) -> b - a == 1000L })
+        assertEquals(208L, offsets.first())
+        assertEquals(4791L, offsets.last())
+        assertTrue(offsets.zipWithNext().all { (a, b) -> b - a in 416L..417L })
         assertEquals(10, VideoFramePlan.offsets(9000, 10).distinct().size)
         assertEquals(12, VideoFramePlan.offsets(750).distinct().size)
     }
@@ -160,6 +160,7 @@ class SurroundingsTest {
             assertEquals(Command.FINISH_SCENE_RECORDING, interpreter.interpret(it))
         }
         assertEquals(Command.DESCRIBE_SCENE, interpreter.interpret("describe surroundings"))
+        assertEquals(Command.DESCRIBE_SCENE, interpreter.interpret("Tell me what I'm looking at."))
     }
 
     @Test
@@ -170,5 +171,14 @@ class SurroundingsTest {
             assertTrue(cue.haptics.sum() < 200)
             assertTrue(pcm.all { kotlin.math.abs(it.toInt()) < 10000 })
         }
+    }
+
+    @Test
+    fun voiceProcessingCueIsQuieterThanTheListeningCueAndDoesNotVibrate() {
+        fun peak(cue: FeedbackCue) = FeedbackCues.synthesize(cue).maxOf { kotlin.math.abs(it.toInt()) }
+        val processing = FeedbackCue.PROCESSING
+        assertTrue(FeedbackCues.synthesize(processing).size < FeedbackCues.synthesize(FeedbackCue.LISTENING).size)
+        assertTrue(peak(processing) < peak(FeedbackCue.LISTENING) / 2)
+        assertTrue(processing.haptics.isEmpty())
     }
 }

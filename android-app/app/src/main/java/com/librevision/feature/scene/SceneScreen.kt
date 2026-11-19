@@ -35,7 +35,7 @@ fun SceneScreen(model: LibreVisionViewModel, state: UiState) {
             scene.summary.isNotBlank() -> scene.summary
             state.hasSceneDescription -> state.scene
             busy -> scene.instruction
-            else -> "Record what's around you, then ask questions."
+            else -> "Point your camera at what you want described."
         }
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().padding(16.dp),
@@ -88,7 +88,7 @@ fun SceneScreen(model: LibreVisionViewModel, state: UiState) {
                 recording -> "Finish recording"
                 preparing || busy -> "Cancel"
                 scene.phase == SurroundingsPhase.ERROR && scene.captured > 0 -> "Retry description"
-                else -> "Record video"
+                else -> "Describe surroundings"
             },
             {
                 when {
@@ -97,6 +97,8 @@ fun SceneScreen(model: LibreVisionViewModel, state: UiState) {
                     busy && scene.phase == SurroundingsPhase.EXTRACTING ->
                         model.cancelSurroundingsCapture()
                     busy -> model.cancelSceneQuestion()
+                    scene.phase == SurroundingsPhase.ERROR && scene.captured > 0 ->
+                        model.retrySurroundingsDescription()
                     else -> model.describe()
                 }
             },
@@ -140,15 +142,15 @@ fun SceneScreen(model: LibreVisionViewModel, state: UiState) {
     }
     if (scene.phase == SurroundingsPhase.CONSENT)
         InstrumentSheet(model::dismissSurroundingsConsent) {
-            Text("Record video", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text("Allow surroundings descriptions", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
             Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
                 Text(
-                    "Only 12 keyframes go to Netra Saathi Cloud AI (Gemini 3 Flash) for surroundings description and Q&A. Video is processed and deleted after selection. Frames clear when you leave, or after 5 minutes.",
+                    "Allow Saathi to send selected pictures to Google Gemini when you ask for a surroundings description. You can change this in Settings.",
                     fontSize = 20.sp,
                 )
             }
             InstrumentKey(
-                "Start recording",
+                "Allow and describe",
                 model::confirmSurroundingsCapture,
                 Modifier.fillMaxWidth(),
                 LVIcons.Play,

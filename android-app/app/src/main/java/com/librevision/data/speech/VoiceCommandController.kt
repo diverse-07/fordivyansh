@@ -27,7 +27,7 @@ enum class ListeningPhase {
 
 data class ListeningState(
     val phase: ListeningPhase = ListeningPhase.IDLE,
-    val message: String = "Listening locally for Hey Saathi.",
+    val message: String = "Listening locally for Hey Vision.",
     val sessionActive: Boolean = false,
 )
 
@@ -163,16 +163,11 @@ class VoiceCommandController(
                                     !activation.echoesOwnSpeech(text, SystemClock.elapsedRealtime())
                             ) {
                                 inputWindow.open()
-                                val bare =
-                                    AppSpeechPhrases.wakePhrases.any {
-                                        CommandInterpreter().normalize(text) == it
-                                    }
-                                val authorization =
-                                    if (bare) inputWindow.token() else inputWindow.claim()
+                                val authorization = inputWindow.token()
                                 send(
                                     RecognizedCommand(
                                         Command.UNKNOWN,
-                                        text,
+                                        AppSpeechPhrases.wakePhrases.first(),
                                         session,
                                         true,
                                         activationId = authorization,
@@ -265,7 +260,7 @@ class VoiceCommandController(
             report(
                 active,
                 ListeningPhase.LISTENING,
-                "Listening locally for Hey Saathi.",
+                "Listening locally for Hey Vision.",
             )
             capture =
                 Thread(

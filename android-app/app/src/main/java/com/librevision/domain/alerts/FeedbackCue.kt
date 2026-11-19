@@ -7,8 +7,10 @@ enum class FeedbackCue(
     val noteMs: Int,
     val haptics: List<Long>,
     val amplitude: Int = 100,
+    val gain: Float = 1f,
 ) {
     LISTENING("Listening", listOf(660, 880), 45, listOf(0, 18)),
+    PROCESSING("Processing voice request", listOf(540), 70, emptyList(), gain = .4f),
     CONFIRMED("Ready", listOf(523, 659), 55, listOf(0, 22)),
     CAPTURED("View captured", listOf(988), 45, listOf(0, 15)),
     COMPLETE("Capture complete", listOf(523, 659, 784), 55, listOf(0, 18, 28, 18)),

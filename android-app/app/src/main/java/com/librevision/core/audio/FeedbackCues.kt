@@ -21,13 +21,13 @@ class FeedbackCues(context: Context, private val playback: (Boolean) -> Unit) : 
     @Volatile private var closed = false
     private var last = 0L
 
-    fun play(cue: FeedbackCue, withSound: Boolean = true) {
+    fun play(cue: FeedbackCue, withSound: Boolean = true, practice: Boolean = false) {
         if (closed) return
         val now = SystemClock.elapsedRealtime()
         if (cue != FeedbackCue.OBSTACLE && now - last < 120) return
         last = now
         val ticket = generation.incrementAndGet()
-        if (hapticsEnabled && vibrator?.hasVibrator() == true) {
+        if (hapticsEnabled && cue.haptics.isNotEmpty() && vibrator?.hasVibrator() == true) {
             val times = cue.haptics.toLongArray()
             val amplitudes = IntArray(times.size) { if (it % 2 == 0) 0 else cue.amplitude }
             runCatching { vibrator.vibrate(VibrationEffect.createWaveform(times, amplitudes, -1)) }
@@ -35,7 +35,7 @@ class FeedbackCues(context: Context, private val playback: (Boolean) -> Unit) : 
         worker.execute {
             if (closed || ticket != generation.get()) return@execute
             runCatching { track?.stop() }
-            if (!soundEnabled || !withSound) {
+            if ((!soundEnabled && !practice) || !withSound) {
                 main.post { if (ticket == generation.get()) playback(false) }
                 return@execute
             }
@@ -69,7 +69,9 @@ class FeedbackCues(context: Context, private val playback: (Boolean) -> Unit) : 
                 output.write(padded, 0, padded.size)
                 output.setPlaybackHeadPosition(0)
                 if (ticket != generation.get() || closed) return@runCatching
-                main.post { if (ticket == generation.get()) playback(true) }
+                // The short ready tones can coincide with the first words of a request.
+                val guardsInput = cue != FeedbackCue.VOICE_TRIGGER && cue != FeedbackCue.LISTENING
+                main.post { if (ticket == generation.get()) playback(guardsInput) }
                 output.play()
                 main.postDelayed(
                     {
@@ -116,7 +118,7 @@ class FeedbackCues(context: Context, private val playback: (Boolean) -> Unit) : 
                 val decay = exp(-3.0 * position / perNote)
                 val frequency = cue.frequencies[note].toDouble()
                 val value = sin(2 * PI * frequency * t) + .16 * sin(2 * PI * frequency * 2 * t)
-                (value * attack * release * decay * 7000)
+                (value * attack * release * decay * 7000 * cue.gain)
                     .roundToInt()
                     .coerceIn(-32767, 32767)
                     .toShort()

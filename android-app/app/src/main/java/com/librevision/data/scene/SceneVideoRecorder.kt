@@ -58,6 +58,7 @@ class SceneVideoRecorder(private val context: Context) : AutoCloseable {
     private var startedAt = 0L
     private var stoppedAt = 0L
     private var generation = 0L
+    private var durationLimitMs = VideoFramePlan.MAX_DURATION_MS
 
     fun attach(view: PreviewView, owner: LifecycleOwner) {
         this.view = view
@@ -71,8 +72,10 @@ class SceneVideoRecorder(private val context: Context) : AutoCloseable {
         owner = null
     }
 
-    suspend fun record(): RecordedSceneVideo {
+    suspend fun record(durationMs: Long = VideoFramePlan.MAX_DURATION_MS): RecordedSceneVideo {
         check(pending == null) { "A video is already recording." }
+        require(durationMs in 750..VideoFramePlan.MAX_DURATION_MS)
+        durationLimitMs = durationMs
         generation++
         val result = CompletableDeferred<RecordedSceneVideo>()
         pending = result
@@ -83,6 +86,8 @@ class SceneVideoRecorder(private val context: Context) : AutoCloseable {
         if (view != null) bind()
         return try {
             withTimeout(45000) { result.await() }
+        } catch (_: TimeoutCancellationException) {
+            throw IllegalStateException("The camera did not finish recording. Try again.")
         } finally {
             if (pending === result) cancel()
         }
@@ -126,7 +131,7 @@ class SceneVideoRecorder(private val context: Context) : AutoCloseable {
                     file = output
                     val options =
                         FileOutputOptions.Builder(output)
-                            .setDurationLimitMillis(VideoFramePlan.MAX_DURATION_MS)
+                            .setDurationLimitMillis(durationLimitMs)
                             .setFileSizeLimit(10_000_000)
                             .build()
                     // Deliberately omit withAudioEnabled(): no microphone audio is recorded or
@@ -143,7 +148,7 @@ class SceneVideoRecorder(private val context: Context) : AutoCloseable {
                                     mutable.value = VideoRecordingState(VideoPhase.RECORDING)
                                 }
                                 is VideoRecordEvent.Status ->
-                                    mutable.value =
+                                    if (mutable.value.phase == VideoPhase.RECORDING) mutable.value =
                                         VideoRecordingState(
                                             VideoPhase.RECORDING,
                                             event.recordingStats.recordedDurationNanos / 1_000_000,
@@ -196,7 +201,7 @@ class SceneVideoRecorder(private val context: Context) : AutoCloseable {
     }
 
     fun finish() {
-        if (recording == null) return
+        if (recording == null || mutable.value.phase == VideoPhase.FINALIZING) return
         stoppedAt = SystemClock.elapsedRealtime()
         mutable.update { it.copy(phase = VideoPhase.FINALIZING) }
         recording?.stop()

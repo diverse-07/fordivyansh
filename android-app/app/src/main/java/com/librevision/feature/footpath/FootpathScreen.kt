@@ -25,6 +25,8 @@ fun FootpathScreen(model: LibreVisionViewModel, state: UiState) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         ScreenHeader("Check Footpath", model::back, model::voice)
+        Text("Detects supported general objects. Potholes, wires and overhead hazards are not reliably detected.",
+            fontSize = 14.sp, color = colors.secondary)
         FootpathStatusBanner(state.indicator, compact = true, scanning = state.scanRequested)
         Box(
             Modifier.weight(1f)

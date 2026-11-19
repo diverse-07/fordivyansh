@@ -17,6 +17,7 @@ class RecognitionPlaybackGate(private val nowMs: () -> Long) {
     @Volatile private var until = 0L
 
     fun playback(active: Boolean) {
+        if (active == playing) return
         if (active) epoch.incrementAndGet()
         playing = active
         until = nowMs() + 600

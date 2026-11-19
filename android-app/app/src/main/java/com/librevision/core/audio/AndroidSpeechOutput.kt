@@ -1,6 +1,7 @@
 package com.librevision.core.audio
 
 import android.content.Context
+import android.content.Intent
 import android.media.*
 import android.os.Bundle
 import android.os.Handler
@@ -10,6 +11,7 @@ import android.speech.tts.UtteranceProgressListener
 import com.librevision.domain.alerts.NativeVoice
 import com.librevision.domain.alerts.NativeVoicePolicy
 import com.librevision.domain.alerts.SpeechOutput
+import com.librevision.domain.alerts.SpeechEngineConnection
 import java.util.Locale
 import java.util.UUID
 
@@ -24,6 +26,7 @@ class AndroidSpeechOutput(
     private val playback: (Boolean) -> Unit = {},
     private val available: () -> Unit = {},
     private val onSpoken: (String) -> Unit = {},
+    private val engineUnavailable: (Boolean) -> Unit = {},
 ) : SpeechOutput {
     private val main = Handler(Looper.getMainLooper())
     private val audio = context.getSystemService(AudioManager::class.java)
@@ -53,38 +56,51 @@ class AndroidSpeechOutput(
                 main,
             )
             .build()
-    private var ready = false
-    private var failed = false
     private var closed = false
     private var pending: String? = null
     private var currentId: String? = null
     private var locale = Locale.US
     private var timeout: Runnable? = null
     private var audible = true
-    private val tts =
-        TextToSpeech(context.applicationContext) { status ->
-            main.post {
-                if (!closed) {
-                    ready = status == TextToSpeech.SUCCESS
-                    failed = !ready
-                    val text = pending
-                    pending = null
-                    // Only a message waiting for native initialization is resumed here.
-                    if (text != null) {
-                        if (ready) speak(text)
-                        else
-                            fail(
-                                currentId,
-                                "Android speech engine unavailable. Check Android Text-to-speech settings.",
-                            )
-                    }
-                }
-            }
-        }
+    private val connection = SpeechEngineConnection<TextToSpeech>(
+        installedEngines = {
+            @Suppress("DEPRECATION")
+            context.packageManager.queryIntentServices(
+                Intent(TextToSpeech.Engine.INTENT_ACTION_TTS_SERVICE), 0,
+            ).filter { it.serviceInfo?.enabled == true && it.serviceInfo?.applicationInfo?.enabled == true }
+                .sortedByDescending { it.priority }.map { it.serviceInfo.packageName }
+        },
+        create = { name, initialized ->
+            TextToSpeech(context.applicationContext, { status ->
+                main.post { initialized(status == TextToSpeech.SUCCESS) }
+            }, name)
+        },
+        prepare = ::prepareEngine,
+        dispose = { it.shutdown() },
+        scheduleTimeout = { expired ->
+            val task = Runnable { expired() }
+            main.postDelayed(task, 4000)
+            val cancel: () -> Unit = { main.removeCallbacks(task) }
+            cancel
+        },
+        connected = {
+            engineUnavailable(false)
+            val text = pending
+            pending = null
+            if (text != null && currentId != null && !closed) speak(text)
+        },
+        unavailable = {
+            engineUnavailable(true)
+            if (currentId != null) fail(currentId, ENGINE_UNAVAILABLE)
+            else unavailable(ENGINE_UNAVAILABLE)
+        },
+    )
 
-    init {
+    init { connection.connect() }
+
+    private fun prepareEngine(tts: TextToSpeech): Boolean {
         tts.setAudioAttributes(attributes)
-        tts.setOnUtteranceProgressListener(
+        return tts.setOnUtteranceProgressListener(
             object : UtteranceProgressListener() {
                 override fun onStart(id: String?) {
                     main.post { if (id == currentId && audible) available() }
@@ -113,7 +129,15 @@ class AndroidSpeechOutput(
                     }
                 }
             }
-        )
+        ) == TextToSpeech.SUCCESS
+    }
+
+    fun reconnect(force: Boolean = false) {
+        if (closed) return
+        if (force || connection.state == SpeechEngineConnection.State.FAILED) {
+            engineUnavailable(false)
+            connection.connect(force)
+        }
     }
 
     fun language(bangla: Boolean) {
@@ -134,22 +158,22 @@ class AndroidSpeechOutput(
         audible = audio.getStreamVolume(AudioManager.STREAM_MUSIC) > 0
         if (!audible) unavailable("Media volume is muted. Increase media volume and replay.")
         audio.requestAudioFocus(focus)
+        if (connection.state == SpeechEngineConnection.State.FAILED) {
+            fail(id, ENGINE_UNAVAILABLE)
+            return
+        }
+        val tts = connection.readyEngine()
+        if (tts == null) {
+            pending = text
+            return
+        }
+        // Engine startup has its own deadline; do not spend the playback deadline waiting to bind.
         val watchdog = Runnable {
             fail(id, "Speech playback timed out. Check your audio output and replay.")
         }
         timeout = watchdog
-        main.postDelayed(
-            watchdog,
-            (text.split(Regex("\\s+")).size * 450L + 3000).coerceIn(12000, 30000),
-        )
-        if (failed) {
-            fail(id, "Android speech engine unavailable. Check Android Text-to-speech settings.")
-            return
-        }
-        if (!ready) {
-            pending = text
-            return
-        }
+        main.postDelayed(watchdog,
+            (text.split(Regex("\\s+")).size * 450L + 3000).coerceIn(12000, 30000))
         try {
             tts.setAudioAttributes(attributes)
             val current = tts.voice
@@ -225,7 +249,7 @@ class AndroidSpeechOutput(
         pending = null
         timeout?.let { main.removeCallbacks(it) }
         timeout = null
-        tts.stop()
+        runCatching { connection.readyEngine()?.stop() }
         audio.abandonAudioFocusRequest(focus)
         playback(false)
     }
@@ -233,6 +257,11 @@ class AndroidSpeechOutput(
     override fun close() {
         closed = true
         stop()
-        tts.shutdown()
+        connection.close()
+    }
+
+    companion object {
+        private const val ENGINE_UNAVAILABLE =
+            "Android speech engine unavailable. Install or update Speech Recognition & Synthesis from Google, then return and tap Test speech."
     }
 }

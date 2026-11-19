@@ -200,7 +200,7 @@ fun CameraPreview(
                                 val right = box.right.coerceIn(0f, 1f) * size.width
                                 val bottom = box.bottom.coerceIn(0f, 1f) * size.height
 
-                                val isGroundHazard = box.bottom > 0.65f || detection.label in setOf(
+                                val isGroundHazard = detection.label in setOf(
                                     "pothole", "crater", "manhole", "open_manhole", "crack", "trench", "construction_trench", "drop-off"
                                 )
                                 val isHeadHazard = box.top < 0.35f && detection.label in setOf(

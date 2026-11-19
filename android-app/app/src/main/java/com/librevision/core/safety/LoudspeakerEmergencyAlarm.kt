@@ -2,313 +2,139 @@ package com.librevision.core.safety
 
 import android.content.Context
 import android.media.*
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
+import android.os.*
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.util.Log
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.sin
 
-/**
- * High-Decibel Emergency Siren & Distress Voice Broadcast.
- * 
- * CRITICAL BLIND SAFETY CAPABILITY:
- * Explicitly forces audio output through the device's PHYSICAL BUILT-IN LOUDSPEAKER
- * at MAXIMUM VOLUME, bypassing any connected Bluetooth TWS earbuds or wired headphones,
- * ensuring bystanders and nearby pedestrians on the street hear the distress call immediately.
- */
-class LoudspeakerEmergencyAlarm(private val context: Context) : AutoCloseable {
-
-    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    private val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-        manager.defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    }
-
-    private val mainHandler = Handler(Looper.getMainLooper())
+/** Local distress alarm. This class does not send a guardian notification. */
+class LoudspeakerEmergencyAlarm(context: Context) : AutoCloseable {
+    private val audio = context.getSystemService(AudioManager::class.java)
+    private val vibrator = context.getSystemService(Vibrator::class.java)
+    private val main = Handler(Looper.getMainLooper())
     val isAlarmActive = AtomicBoolean(false)
-
-    private var audioTrack: AudioTrack? = null
+    private val generation = AtomicLong()
+    private val lock = Any()
+    private var track: AudioTrack? = null
     private var tts: TextToSpeech? = null
-    private var isTtsReady = false
-
-    private var previousAudioMode = AudioManager.MODE_NORMAL
-    private var previousAlarmVolume = 0
-    private var previousMusicVolume = 0
-
+    @Volatile private var ready = false
+    private var closed = false
+    private var oldMode: Int? = null
+    private var oldAlarm: Int? = null
+    private var oldMusic: Int? = null
+    private var oldSpeaker = false
+    private var oldDevice: AudioDeviceInfo? = null
+    private val attributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
     init {
         tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
+            ready = status == TextToSpeech.SUCCESS
+            if (ready) {
                 tts?.language = Locale.US
-                isTtsReady = true
+                tts?.setAudioAttributes(attributes)
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String?) {}
-                    override fun onDone(utteranceId: String?) {
-                        if (isAlarmActive.get()) {
-                            mainHandler.postDelayed({ playSirenCycle() }, 400)
-                        }
-                    }
-                    @Deprecated("Deprecated in Java")
-                    override fun onError(utteranceId: String?) {
-                        if (isAlarmActive.get()) {
-                            mainHandler.postDelayed({ playSirenCycle() }, 1000)
-                        }
-                    }
-                    override fun onError(utteranceId: String?, errorCode: Int) {
-                        if (isAlarmActive.get()) {
-                            mainHandler.postDelayed({ playSirenCycle() }, 1000)
-                        }
-                    }
+                    override fun onStart(id: String?) {}
+                    override fun onDone(id: String?) = afterSpeech(id)
+                    @Deprecated("Legacy TTS callback")
+                    override fun onError(id: String?) = afterSpeech(id)
+                    override fun onError(id: String?, code: Int) = afterSpeech(id)
                 })
             }
         }
     }
-
-    /**
-     * Toggles emergency alarm state.
-     */
+    private fun current(ticket: Long) = !closed && isAlarmActive.get() && generation.get() == ticket
+    private fun afterSpeech(id: String?) {
+        val ticket = id?.removePrefix("alarm-")?.toLongOrNull() ?: return
+        main.postDelayed({ if (current(ticket)) cycle(ticket) }, 600)
+    }
     fun toggle(): Boolean {
-        return if (isAlarmActive.get()) {
-            stop()
-            false
-        } else {
-            start()
-            true
-        }
+        if (isAlarmActive.get()) { stop(); return false }
+        start(); return isAlarmActive.get()
     }
-
-    /**
-     * Activates the emergency loudspeaker siren & blind distress announcement.
-     */
     fun start() {
-        if (isAlarmActive.getAndSet(true)) return
-
-        Log.i(TAG, "EMERGENCY ALARM ACTIVATED: Routing to Physical Loudspeaker at MAX volume!")
-
-        saveAndMaximizeAudio()
-        startHapticAlert()
-        playSirenCycle()
+        if (closed || isAlarmActive.getAndSet(true)) return
+        val ticket = generation.incrementAndGet()
+        oldMode = runCatching { audio.mode }.getOrNull()
+        oldAlarm = runCatching { audio.getStreamVolume(AudioManager.STREAM_ALARM) }.getOrNull()
+        oldMusic = runCatching { audio.getStreamVolume(AudioManager.STREAM_MUSIC) }.getOrNull()
+        oldSpeaker = audio.isSpeakerphoneOn
+        if (Build.VERSION.SDK_INT >= 31) oldDevice = audio.communicationDevice
+        runCatching { audio.mode = AudioManager.MODE_IN_COMMUNICATION }
+        runCatching { audio.isSpeakerphoneOn = true }
+        if (Build.VERSION.SDK_INT >= 31) runCatching {
+            audio.availableCommunicationDevices.firstOrNull { it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER }
+                ?.let { audio.setCommunicationDevice(it) }
+        }
+        runCatching { audio.setStreamVolume(AudioManager.STREAM_ALARM, audio.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0) }
+        runCatching { audio.setStreamVolume(AudioManager.STREAM_MUSIC, audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0) }
+        runCatching { vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0,300,150,300,150,500,200),0)) }
+        cycle(ticket)
     }
-
-    /**
-     * Deactivates the emergency alarm and restores previous device audio parameters.
-     */
+    private fun cycle(ticket: Long) {
+        if (!current(ticket)) return
+        Thread({
+            var local: AudioTrack? = null
+            try {
+                val rate = 44100
+                val count = rate * 5 / 2
+                val samples = ShortArray(count) { i ->
+                    val t = i.toDouble()/rate
+                    (sin(2*Math.PI*(1250+400*sin(2*Math.PI*4*t))*t)*Short.MAX_VALUE).toInt().toShort()
+                }
+                if (!current(ticket)) return@Thread
+                local = AudioTrack.Builder().setAudioAttributes(attributes)
+                    .setAudioFormat(AudioFormat.Builder().setSampleRate(rate)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
+                    .setBufferSizeInBytes(count*2).setTransferMode(AudioTrack.MODE_STREAM).build()
+                synchronized(lock) {
+                    if (!current(ticket)) return@synchronized
+                    track = local
+                    audio.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+                        .firstOrNull { it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER }
+                        ?.let { local.preferredDevice = it }
+                    local.play()
+                    check(local.write(samples,0,samples.size) == samples.size)
+                }
+                val start = SystemClock.elapsedRealtime()
+                while (current(ticket) && !AlarmCycle.complete(local.playbackHeadPosition.toLong(),count,
+                        SystemClock.elapsedRealtime()-start)) SystemClock.sleep(20)
+            } catch (_: Exception) {
+                // Speech is still attempted if the tone route/runtime fails.
+            } finally {
+                synchronized(lock) {
+                    runCatching { local?.stop() }; runCatching { local?.release() }
+                    if (track === local) track = null
+                }
+            }
+            main.post { if (current(ticket)) speak(ticket) }
+        },"NetraSaathiAlarm").start()
+    }
+    private fun speak(ticket: Long) {
+        if (!current(ticket)) return
+        if (!ready) { main.postDelayed({ if (current(ticket)) cycle(ticket) },1000); return }
+        val result = runCatching {
+            tts?.speak("Help! I am blind! Please help me!", TextToSpeech.QUEUE_FLUSH,
+                Bundle().apply { putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME,1f) },"alarm-"+ticket)
+        }.getOrNull()
+        if (result == null || result == TextToSpeech.ERROR)
+            main.postDelayed({ if (current(ticket)) cycle(ticket) },1000)
+    }
     fun stop() {
         if (!isAlarmActive.getAndSet(false)) return
-
-        Log.i(TAG, "Emergency alarm deactivated. Restoring audio levels.")
-        mainHandler.removeCallbacksAndMessages(null)
-
-        stopSiren()
-        stopHapticAlert()
-
-        try {
-            tts?.stop()
-        } catch (e: Exception) {
-            Log.w(TAG, "Error stopping TTS: ${e.message}")
+        generation.incrementAndGet()
+        main.removeCallbacksAndMessages(null)
+        synchronized(lock) { runCatching { track?.stop() } }
+        runCatching { tts?.stop() }; runCatching { vibrator?.cancel() }
+        runCatching { audio.isSpeakerphoneOn = oldSpeaker }
+        if (Build.VERSION.SDK_INT >= 31) runCatching {
+            oldDevice?.let { audio.setCommunicationDevice(it) } ?: audio.clearCommunicationDevice()
         }
-
-        restoreAudioSettings()
+        oldMode?.let { runCatching { audio.mode = it } }
+        oldAlarm?.let { runCatching { audio.setStreamVolume(AudioManager.STREAM_ALARM,it,0) } }
+        oldMusic?.let { runCatching { audio.setStreamVolume(AudioManager.STREAM_MUSIC,it,0) } }
     }
-
-    private fun playSirenCycle() {
-        if (!isAlarmActive.get()) return
-
-        Thread({
-            try {
-                // Generate 2.5 seconds of high-pitched alternating two-tone siren
-                val sampleRate = 44100
-                val durationSeconds = 2.5
-                val numSamples = (durationSeconds * sampleRate).toInt()
-                val samples = ShortArray(numSamples)
-
-                for (i in 0 until numSamples) {
-                    val t = i.toDouble() / sampleRate
-                    // Frequency oscillates rapidly between 850 Hz and 1650 Hz
-                    val freq = 1250.0 + 400.0 * sin(2.0 * Math.PI * 4.0 * t)
-                    val sample = (sin(2.0 * Math.PI * freq * t) * 32767.0).toInt().coerceIn(-32768, 32767)
-                    samples[i] = sample.toShort()
-                }
-
-                val bufferSize = AudioTrack.getMinBufferSize(
-                    sampleRate,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT
-                ).coerceAtLeast(samples.size * 2)
-
-                val attributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-
-                val format = AudioFormat.Builder()
-                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                    .setSampleRate(sampleRate)
-                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                    .build()
-
-                val track = AudioTrack.Builder()
-                    .setAudioAttributes(attributes)
-                    .setAudioFormat(format)
-                    .setBufferSizeInBytes(bufferSize)
-                    .setTransferMode(AudioTrack.MODE_STREAM)
-                    .build()
-
-                audioTrack = track
-                // Route directly to built-in physical speaker
-                forceSpeakerRoute(track)
-
-                track.play()
-                track.write(samples, 0, samples.size)
-
-                while (track.playState == AudioTrack.PLAYSTATE_PLAYING && isAlarmActive.get()) {
-                    Thread.sleep(50)
-                }
-
-                runCatching {
-                    if (track.playState == AudioTrack.PLAYSTATE_PLAYING) track.stop()
-                    track.release()
-                }
-                if (audioTrack == track) audioTrack = null
-
-                if (isAlarmActive.get()) {
-                    mainHandler.post { speakDistressAnnouncement() }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error playing siren tone: ${e.message}", e)
-                if (isAlarmActive.get()) {
-                    mainHandler.postDelayed({ speakDistressAnnouncement() }, 1000)
-                }
-            }
-        }, "LoudspeakerSirenThread").start()
-    }
-
-    private fun speakDistressAnnouncement() {
-        if (!isAlarmActive.get() || !isTtsReady) {
-            if (isAlarmActive.get()) mainHandler.postDelayed({ playSirenCycle() }, 1000)
-            return
-        }
-
-        val speechText = "HELP! I AM BLIND! PLEASE HELP ME! EMERGENCY AT THIS LOCATION!"
-        val params = android.os.Bundle().apply {
-            putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_ALARM)
-            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
-        }
-        tts?.speak(speechText, TextToSpeech.QUEUE_FLUSH, params, "EmergencyUtterance")
-    }
-
-    private fun forceSpeakerRoute(track: AudioTrack) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val speakerDevice = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).firstOrNull {
-                it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-            }
-            if (speakerDevice != null) {
-                track.preferredDevice = speakerDevice
-                Log.d(TAG, "AudioTrack preferredDevice set to BUILTIN_SPEAKER")
-            }
-        }
-    }
-
-    private fun saveAndMaximizeAudio() {
-        try {
-            previousAudioMode = audioManager.mode
-            previousAlarmVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM)
-            previousMusicVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-
-            // Override communication mode and force speakerphone ON
-            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-            @Suppress("DEPRECATION")
-            audioManager.isSpeakerphoneOn = true
-
-            // Set built-in speaker device for communication on Android 12+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val speaker = audioManager.availableCommunicationDevices.firstOrNull {
-                    it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-                }
-                if (speaker != null) {
-                    audioManager.setCommunicationDevice(speaker)
-                }
-            }
-
-            // Maximize volume
-            val maxAlarm = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxAlarm, 0)
-
-            val maxMusic = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxMusic, 0)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to maximize loudspeaker volume: ${e.message}")
-        }
-    }
-
-    private fun restoreAudioSettings() {
-        try {
-            @Suppress("DEPRECATION")
-            audioManager.isSpeakerphoneOn = false
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                audioManager.clearCommunicationDevice()
-            }
-
-            audioManager.mode = previousAudioMode
-            if (previousAlarmVolume > 0) {
-                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousAlarmVolume, 0)
-            }
-            if (previousMusicVolume > 0) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, previousMusicVolume, 0)
-            }
-        } catch (e: Exception) {
-            Log.w(TAG, "Error restoring audio settings: ${e.message}")
-        }
-    }
-
-    private fun startHapticAlert() {
-        if (!vibrator.hasVibrator()) return
-        val pattern = longArrayOf(0, 300, 150, 300, 150, 500, 200)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0)) // Repeat from index 0
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator.vibrate(pattern, 0)
-        }
-    }
-
-    private fun stopHapticAlert() {
-        try {
-            vibrator.cancel()
-        } catch (e: Exception) {
-            // Ignore
-        }
-    }
-
-    private fun stopSiren() {
-        try {
-            audioTrack?.apply {
-                if (playState == AudioTrack.PLAYSTATE_PLAYING) stop()
-                release()
-            }
-            audioTrack = null
-        } catch (e: Exception) {
-            // Ignore
-        }
-    }
-
-    override fun close() {
-        stop()
-        tts?.shutdown()
-        tts = null
-    }
-
-    companion object {
-        private const val TAG = "NetraEmergencyAlarm"
-    }
+    override fun close() { stop(); closed = true; generation.incrementAndGet(); tts?.shutdown(); tts = null }
 }

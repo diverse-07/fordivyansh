@@ -1,123 +1,77 @@
 package com.librevision.core.audio
-
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.SystemClock
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.sin
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.*
 
-/**
- * Harvard Mobilio Binaural Spatial Audio Sonar Engine
- * Emits continuous, gentle stereo audio pulses panning left/right
- * to guide the blind user along the center of the safe walking path.
- */
+/** Sonifies a fresh obstacle's side, not a safe direction or calibrated urgency. */
 class SpatialSonarEngine : AutoCloseable {
-
     private val executor = Executors.newSingleThreadExecutor()
-    private val isRunning = AtomicBoolean(false)
-    private var audioTrack: AudioTrack? = null
-
-    @Volatile var isEnabled: Boolean = true
-    @Volatile var currentSteeringBias: Float = 0.0f // -1.0 (hard left) to +1.0 (hard right)
-    @Volatile var pulseRateMs: Long = 700L          // Distance-based interval
-
-    init {
-        initAudioTrack()
+    private val generation = AtomicLong()
+    @Volatile private var running = false
+    @Volatile private var closed = false
+    @Volatile private var targetAt = 0L
+    @Volatile private var bias = 0f
+    @Volatile var isEnabled = true
+    fun updateSteering(offsetNorm: Float, distanceAheadMeters: Float?) {
+        if (!offsetNorm.isFinite()) { clearTarget(); return }
+        bias = offsetNorm.coerceIn(-1f, 1f)
+        targetAt = SystemClock.elapsedRealtime()
     }
-
-    private fun initAudioTrack() {
-        val sampleRate = 22050
-        val bufferSize = AudioTrack.getMinBufferSize(
-            sampleRate,
-            AudioFormat.CHANNEL_OUT_STEREO,
-            AudioFormat.ENCODING_PCM_16BIT
-        )
-
-        audioTrack = AudioTrack.Builder()
-            .setAudioAttributes(
-                AudioAttributes.Builder()
+    fun clearTarget() { targetAt = 0L }
+    @Synchronized fun start() {
+        if (closed || running) return
+        running = true
+        val ticket = generation.incrementAndGet()
+        executor.execute { loop(ticket) }
+    }
+    @Synchronized fun pause() {
+        running = false; generation.incrementAndGet(); clearTarget()
+    }
+    private fun loop(ticket: Long) {
+        var track: AudioTrack? = null
+        try {
+            val rate = 22050
+            val n = rate * 60 / 1000
+            track = AudioTrack.Builder()
+                .setAudioAttributes(AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-            )
-            .setAudioFormat(
-                AudioFormat.Builder()
-                    .setSampleRate(sampleRate)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+                .setAudioFormat(AudioFormat.Builder().setSampleRate(rate)
                     .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
-                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                    .build()
-            )
-            .setTransferMode(AudioTrack.MODE_STREAM)
-            .setBufferSizeInBytes(bufferSize)
-            .build()
-    }
-
-    fun updateSteering(offsetNorm: Float, distanceAheadMeters: Float) {
-        currentSteeringBias = offsetNorm.coerceIn(-1.0f, 1.0f)
-        
-        pulseRateMs = when {
-            distanceAheadMeters < 1.5f -> 250L
-            distanceAheadMeters < 3.0f -> 450L
-            else -> 750L
-        }
-    }
-
-    fun start() {
-        if (isRunning.getAndSet(true)) return
-        audioTrack?.play()
-        executor.execute { loopSonar() }
-    }
-
-    fun pause() {
-        isRunning.set(false)
-        audioTrack?.pause()
-        audioTrack?.flush()
-    }
-
-    private fun loopSonar() {
-        val sampleRate = 22050
-        val toneDurationMs = 60
-        val numSamples = (sampleRate * (toneDurationMs / 1000.0)).toInt()
-        val freq = 520.0
-
-        val monoWave = ShortArray(numSamples)
-        for (i in 0 until numSamples) {
-            val t = i.toDouble() / sampleRate
-            val envelope = 0.5 * (1.0 - kotlin.math.cos(2.0 * Math.PI * i / numSamples))
-            val sample = (sin(2.0 * Math.PI * freq * t) * envelope * 0.45 * Short.MAX_VALUE).toInt()
-            monoWave[i] = sample.toShort()
-        }
-
-        val stereoBuffer = ShortArray(numSamples * 2)
-
-        while (isRunning.get()) {
-            if (!isEnabled) {
-                SystemClock.sleep(200)
-                continue
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
+                .setBufferSizeInBytes(max(n * 4, AudioTrack.getMinBufferSize(rate,
+                    AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT)))
+                .setTransferMode(AudioTrack.MODE_STREAM).build()
+            val mono = ShortArray(n) { i ->
+                (sin(2 * PI * 520 * i / rate) * .5 * (1 - cos(2 * PI * i / n)) * .35 * Short.MAX_VALUE).toInt().toShort()
             }
-
-            val leftGain = ((1.0f - currentSteeringBias) / 2.0f).coerceIn(0.15f, 1.0f)
-            val rightGain = ((1.0f + currentSteeringBias) / 2.0f).coerceIn(0.15f, 1.0f)
-
-            var bufIdx = 0
-            for (i in 0 until numSamples) {
-                stereoBuffer[bufIdx++] = (monoWave[i] * leftGain).toInt().toShort()
-                stereoBuffer[bufIdx++] = (monoWave[i] * rightGain).toInt().toShort()
+            val buffer = ShortArray(n * 2)
+            track.play()
+            while (!closed && running && generation.get() == ticket) {
+                if (!isEnabled || targetAt == 0L || SystemClock.elapsedRealtime() - targetAt !in 0..1500) {
+                    SystemClock.sleep(30); continue
+                }
+                val left = ((1 - bias) / 2).coerceIn(.15f, 1f)
+                val right = ((1 + bias) / 2).coerceIn(.15f, 1f)
+                mono.indices.forEach { i ->
+                    buffer[2*i] = (mono[i] * left).toInt().toShort()
+                    buffer[2*i+1] = (mono[i] * right).toInt().toShort()
+                }
+                if (track.write(buffer, 0, buffer.size) < 0) break
+                val until = SystemClock.elapsedRealtime() + 690
+                while (generation.get() == ticket && SystemClock.elapsedRealtime() < until) SystemClock.sleep(20)
             }
-
-            audioTrack?.write(stereoBuffer, 0, stereoBuffer.size)
-
-            val sleepTime = (pulseRateMs - toneDurationMs).coerceAtLeast(50L)
-            SystemClock.sleep(sleepTime)
+        } catch (_: Exception) {
+            // Optional sonar failure cannot crash speech, haptics or scanning.
+        } catch (_: LinkageError) {
+        } finally {
+            runCatching { track?.stop() }; runCatching { track?.release() }
+            if (generation.get() == ticket) running = false
         }
     }
-
-    override fun close() {
-        isRunning.set(false)
-        audioTrack?.stop()
-        audioTrack?.release()
-        executor.shutdownNow()
-    }
+    override fun close() { closed = true; pause(); executor.shutdown() }
 }

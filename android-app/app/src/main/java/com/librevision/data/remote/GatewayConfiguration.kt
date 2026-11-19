@@ -3,7 +3,7 @@ package com.librevision.data.remote
 import java.net.URI
 
 object GatewayConfiguration {
-    const val LOCAL_URL = "https://megalarper.onrender.com"
+    const val LOCAL_URL = "http://127.0.0.1:8790"
     const val UNAVAILABLE = "Netra Saathi Cloud AI is not connected. Local safety features still work."
 
     fun validUrl(value: String, debug: Boolean): Boolean = runCatching {
@@ -17,10 +17,7 @@ object GatewayConfiguration {
             uri.path in listOf("", "/") &&
             (uri.scheme == "https" ||
                 (debug && uri.scheme == "http" && (
-                    host in setOf("127.0.0.1", "localhost", "10.0.2.2") ||
-                    host.startsWith("192.168.") ||
-                    host.startsWith("10.") ||
-                    host.startsWith("172.")
+                    host in setOf("127.0.0.1", "localhost")
                 )))
     }
         .getOrDefault(false)

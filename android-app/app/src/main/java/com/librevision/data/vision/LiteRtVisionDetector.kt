@@ -6,6 +6,9 @@ import com.librevision.data.vision.rfdetr.RfDetr
 import com.librevision.domain.vision.*
 import java.io.File
 
+/** RF-DETR COCO only. The archived pothole asset is not an enabled detector.
+ * Specialized ground/overhead rules are not evidence of model coverage.
+ */
 class LiteRtVisionDetector(private val directory: File, private val status: (String) -> Unit) :
     VisionDetector {
     private var engine: RfDetr =

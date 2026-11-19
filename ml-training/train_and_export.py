@@ -29,6 +29,7 @@ def verify_environment():
 
 def train_model(data_yaml: str, epochs: int = 50, imgsz: int = 320, batch: int = 32):
     from ultralytics import YOLO
+    import torch
 
     logger.info("Initializing YOLOv8n backbone...")
     model = YOLO("yolov8n.pt")
@@ -42,7 +43,7 @@ def train_model(data_yaml: str, epochs: int = 50, imgsz: int = 320, batch: int =
         patience=12,
         save=True,
         save_period=10,
-        device=0 if os.environ.get("CUDA_VISIBLE_DEVICES") != "" else "cpu",
+        device=0 if torch.cuda.is_available() else "cpu",
         workers=4,
         project="runs_vision_assist",
         name="pothole_detector",
@@ -84,10 +85,14 @@ def export_to_int8_tflite(model_path: Path, imgsz: int = 320, data_yaml: str = "
     logger.info(f"Export successful. Artifact generated at: {export_result}")
     return export_result
 
-def generate_labels_file(output_dir: Path):
-    labels = ["pothole", "crack", "manhole"]
+def generate_labels_file(output_dir: Path, model_path: Path):
+    from ultralytics import YOLO
+    names = YOLO(str(model_path)).names
+    labels = [names[i] for i in range(len(names))] if isinstance(names, dict) else list(names)
+    if not labels or any(not isinstance(label, str) or not label.strip() for label in labels):
+        raise ValueError("Invalid trained class mapping")
     labels_file = output_dir / "labels.txt"
-    with open(labels_file, "w") as f:
+    with open(labels_file, "w", encoding="utf-8") as f:
         for label in labels:
             f.write(f"{label}\n")
     logger.info(f"Labels specification written to: {labels_file}")
@@ -116,9 +121,20 @@ def main():
             sys.exit(1)
 
     export_path = export_to_int8_tflite(best_pt, imgsz=args.imgsz, data_yaml=args.data)
-    generate_labels_file(Path(export_path).parent if os.path.exists(export_path) else Path("."))
+    # Export the Android ONNX contract from the same weights and preserve labels/checksum.
+    from ultralytics import YOLO
+    import hashlib
+    import json
+    onnx_path = Path(YOLO(str(best_pt)).export(format="onnx", imgsz=args.imgsz, opset=17, dynamic=False))
+    manifest = {"format": "onnx", "inputSize": args.imgsz,
+                "sha256": hashlib.sha256(onnx_path.read_bytes()).hexdigest(),
+                "validatedForNavigation": False}
+    onnx_path.with_suffix(".json").write_text(json.dumps(manifest, indent=2))
+    artifact = Path(export_path)
+    generate_labels_file(artifact if artifact.is_dir() else artifact.parent, best_pt)
+    generate_labels_file(onnx_path.parent, best_pt)
 
-    logger.info("All steps complete. Model is ready for Flutter deployment.")
+    logger.info("All steps complete. Model is ready for model evaluation; it is not automatically enabled in the Android app.")
 
 if __name__ == "__main__":
     main()

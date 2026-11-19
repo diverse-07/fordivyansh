@@ -139,8 +139,8 @@ internal fun MuseVoicePanel(
                 answer.ifBlank {
                     when {
                         busy -> "One moment…"
-                        listening -> "Ask a question or say a place."
-                        else -> "Say Hey Saathi or tap Speak."
+                        listening -> "Ask a question or say what you want to do. Try “Open Settings” or “What can I say?”"
+                        else -> "Say Hey Vision or tap Speak."
                     }
                 },
                 fontSize = 24.sp,

@@ -1,3 +1,5 @@
+import { geminiTransport, GEMINI_MODEL } from "./gemini.mjs";
+export { DailyRequestBudget } from "./daily-budget.mjs";
 // Documented Meta Chat Completions, selected JPEG and validated app function calls.
 // https://dev.meta.ai/docs/image-understanding and /tool-calling
 const MODEL = "muse-spark-1.3",
@@ -101,6 +103,9 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
       local =
         env.LOCAL_ONLY === "true" &&
         ["127.0.0.1", "localhost"].includes(url.hostname);
+    const useGemini = env.AI_PROVIDER === "gemini" || !!env.GEMINI_API_KEY;
+    const responseModel = useGemini ? GEMINI_MODEL : MODEL;
+    const upstreamFetch = useGemini ? geminiTransport(fetchUpstream, env, local) : fetchUpstream;
     // Public app builds carry only the URL. Private test gateways may still require a token.
     if (
       !local &&
@@ -111,21 +116,24 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
     )
       return error("UNAUTHORIZED", 401);
     if (url.pathname === "/health" && request.method === "GET")
-      return reply({ model: MODEL, configured: !!env.META_API_KEY });
+      return reply({ protocolVersion: 1, model: responseModel, configured: !!(useGemini ? env.GEMINI_API_KEY : env.META_API_KEY) && (local || !!(env.CLIENT_LIMITER && env.GLOBAL_LIMITER && (!useGemini || env.DAILY_BUDGET))), capabilities: { scene: true, assistant: true, assistantActions: true, transcription: true, guardianNotifications: false, telemetry: false } });
     if (
       !["/analyze", "/assistant", "/transcribe"].includes(url.pathname) ||
       request.method !== "POST"
     )
       return error("NOT_FOUND", 404);
     const audio = url.pathname === "/transcribe";
-    if (
-      request.headers.get("Content-Type")?.split(";")[0] !==
-      (audio ? "application/vnd.librevision.wav+gzip" : "application/json")
-    )
+    const contentType = request.headers.get("Content-Type")?.split(";")[0]?.trim().toLowerCase();
+    const supportedContentType = audio
+      ? ["application/vnd.netrasaathi.wav+gzip", "application/vnd.librevision.wav+gzip"].includes(contentType)
+      : contentType === "application/json";
+    if (!supportedContentType)
       return error("CONTENT_TYPE", 415);
-    if (!env.META_API_KEY) return error("META_NOT_CONFIGURED", 503);
+    if (!(useGemini ? env.GEMINI_API_KEY : env.META_API_KEY)) return error(useGemini ? "GEMINI_NOT_CONFIGURED" : "META_NOT_CONFIGURED", 503);
+    if (useGemini && !local && !env.DAILY_BUDGET) return error("BUDGET_NOT_CONFIGURED", 503);
     if (!local && (!env.CLIENT_LIMITER || !env.GLOBAL_LIMITER))
       return error("LIMITER_NOT_CONFIGURED", 503);
+    try {
     const client = request.headers.get("CF-Connecting-IP") ?? "loopback";
     if (
       env.CLIENT_LIMITER &&
@@ -137,11 +145,13 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
       !(await env.GLOBAL_LIMITER.limit({ key: "all" })).success
     )
       return error("RATE_LIMIT", 429);
+
+    } catch { return error("LIMITER_UNAVAILABLE", 503); }
     if (audio)
       return transcribeAudio(
         request,
         env,
-        fetchUpstream,
+        upstreamFetch,
         Math.min(timeoutMs, 12000),
       );
     let p;
@@ -289,7 +299,7 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
       timeout = setTimeout(() => abort.abort(), timeoutMs),
       start = Date.now();
     try {
-      const upstream = await fetchUpstream(
+      const upstream = await upstreamFetch(
         "https://api.meta.ai/v1/chat/completions",
         {
           method: "POST",
@@ -306,12 +316,12 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
           upstream.status === 429
             ? "RATE_LIMIT"
             : upstream.status === 401 || upstream.status === 403
-              ? "META_AUTH_FAILED"
+              ? (useGemini ? "GEMINI_AUTH_FAILED" : "META_AUTH_FAILED")
               : upstream.status === 404
                 ? "MODEL_UNAVAILABLE"
                 : upstream.status === 402
-                  ? "META_BILLING_UNAVAILABLE"
-                  : "META_UNAVAILABLE",
+                  ? (useGemini ? "GEMINI_BILLING_UNAVAILABLE" : "META_BILLING_UNAVAILABLE")
+                  : (useGemini ? "GEMINI_UNAVAILABLE" : "META_UNAVAILABLE"),
           upstream.status === 429 ? 429 : 503,
         );
       const result = JSON.parse(await bounded(upstream.body, 64000)),
@@ -350,7 +360,7 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
       }))
         if (Number.isSafeInteger(value) && value >= 0) usage[key] = value;
       return reply({
-        model: MODEL,
+        model: responseModel,
         text,
         action,
         latencyMs: Date.now() - start,
@@ -359,8 +369,8 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
     } catch {
       return error(
         abort.signal.aborted
-          ? "META_TIMEOUT"
-          : "META_NETWORK_OR_RESPONSE_ERROR",
+          ? (useGemini ? "GEMINI_TIMEOUT" : "META_TIMEOUT")
+          : (useGemini ? "GEMINI_NETWORK_OR_RESPONSE_ERROR" : "META_NETWORK_OR_RESPONSE_ERROR"),
         abort.signal.aborted ? 504 : 502,
       );
     } finally {
@@ -368,4 +378,11 @@ export function createHandler(fetchUpstream = fetch, timeoutMs = 18000) {
     }
   };
 }
-export default { fetch: createHandler() };
+const handler = createHandler();
+export default { async fetch(request, env) {
+  const start = Date.now();
+  const response = await handler(request, env);
+  // Aggregate operational metadata only: no bodies, images, audio, tokens or coordinates.
+  console.log(JSON.stringify({status: response.status, latencyMs: Date.now() - start}));
+  return response;
+} };

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate, verify and package public LibreVision APK releases. Never reads API keys."""
+"""Validate, verify and package public NetraSaathi APK releases. Never reads API keys."""
 
 import argparse
 import hashlib
@@ -64,7 +64,7 @@ def release_metadata(ref, run_number, sha):
             "version_code": str(code),
             "version_name": f"dev.{run_number}.{sha[:7]}",
             "release_tag": "latest",
-            "release_title": "LibreVision — latest development build",
+            "release_title": "NetraSaathi — latest development build",
             "prerelease": "true",
         }
     tag = ref.removeprefix("refs/tags/")
@@ -76,7 +76,7 @@ def release_metadata(ref, run_number, sha):
         "version_code": str(code),
         "version_name": tag[1:],
         "release_tag": tag,
-        "release_title": f"LibreVision {tag[1:]}",
+        "release_title": f"NetraSaathi {tag[1:]}",
         "prerelease": str("-" in tag).lower(),
     }
 
@@ -87,13 +87,13 @@ def verify_badging(text, code, name):
         raise ValueError("APK package metadata is missing")
     fields = dict(re.findall(r"([\w]+)='([^']*)'", package[1]))
     if (
-        fields.get("name") != "com.librevision"
+        fields.get("name") != "com.netrasaathi"
         or fields.get("versionCode") != str(code)
         or fields.get("versionName") != name
         or re.search(r"^application-debuggable\b", text, re.MULTILINE)
     ):
         raise ValueError(
-            "APK must be a non-debuggable LibreVision release with the expected version"
+            "APK must be a non-debuggable NetraSaathi release with the expected version"
         )
     if "uses-permission: name='android.permission.INTERNET'" not in text:
         raise ValueError("APK is missing the network permission")
@@ -119,7 +119,7 @@ def file_sha256(path):
 
 def stage_release(apk, output, metadata, url, sha, root=ROOT):
     output.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(apk, output / "LibreVision.apk")
+    shutil.copyfile(apk, output / "NetraSaathi.apk")
     info = {
         **metadata,
         "commit": sha,
@@ -129,7 +129,7 @@ def stage_release(apk, output, metadata, url, sha, root=ROOT):
     }
     (output / "build-info.json").write_text(json.dumps(info, indent=2) + "\n")
     with zipfile.ZipFile(
-        output / "LibreVision-notices.zip", "w", zipfile.ZIP_DEFLATED
+        output / "NetraSaathi-notices.zip", "w", zipfile.ZIP_DEFLATED
     ) as archive:
         files = [root / "LICENSE", root / "NOTICE"]
         files += sorted((root / "licenses").glob("*"))
@@ -137,12 +137,12 @@ def stage_release(apk, output, metadata, url, sha, root=ROOT):
         for file in files:
             if file.is_file():
                 archive.write(file, file.relative_to(root))
-    checksum_files = ["LibreVision.apk", "LibreVision-notices.zip", "build-info.json"]
+    checksum_files = ["NetraSaathi.apk", "NetraSaathi-notices.zip", "build-info.json"]
     (output / "SHA256SUMS").write_text(
         "".join(f"{file_sha256(output / name)}  {name}\n" for name in checksum_files)
     )
     (output / "release-notes.txt").write_text(
-        f"Install **LibreVision.apk** on an ARM64 Android 8.0+ phone.\n\n"
+        f"Install **NetraSaathi.apk** on an ARM64 Android 8.0+ phone.\n\n"
         f"Version: `{metadata['version_name']}` · build `{metadata['version_code']}` · commit `{sha}`.\n\n"
         f"The app automatically connects to `{url}`. No gateway setup or API key is needed. "
         "Muse requires internet; initial setup downloads the local models. "
@@ -151,7 +151,7 @@ def stage_release(apk, output, metadata, url, sha, root=ROOT):
         "may need to be uninstalled before installing a release.\n\n"
         "Experimental mobility aid. Detection and depth estimates do not establish path safety.\n\n"
         "Created by Pritom Das (@pritomshad). Apache-2.0; third-party terms remain applicable. "
-        "See LibreVision-notices.zip for attribution and license texts. "
+        "See NetraSaathi-notices.zip for attribution and license texts. "
         "SHA256SUMS contains download checksums.\n"
     )
 

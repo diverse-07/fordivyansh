@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ShieldAlert,
   MapPin,
@@ -9,7 +9,6 @@ import {
   Eye,
   Flashlight,
   Bell,
-  CheckCircle,
   Activity,
   User,
   Radio,
@@ -18,42 +17,16 @@ import {
 
 export default function CaretakerDashboard() {
   const [activeSOS, setActiveSOS] = useState(false);
-  const [beaconStatus, setBeaconStatus] = useState("Active (Night Strobe)");
-  const [userLocation, setUserLocation] = useState({
-    lat: "12.9716° N",
-    lng: "77.5946° E",
-    address: "MG Road Sidewalk, Near Metro Station Gate 2",
-    battery: "84%",
-    speed: "0.8 m/s (Walking)",
-    heading: "North-West (315°)"
-  });
-
-  const recentHazards = [
-    {
-      id: 1,
-      zone: "HEAD HEIGHT",
-      name: "Low tree branch",
-      time: "2 mins ago",
-      action: "Spoken warning given: User stepped right",
-      type: "head"
-    },
-    {
-      id: 2,
-      zone: "TORSO LEVEL",
-      name: "Oncoming Bicycle (5m ahead)",
-      time: "5 mins ago",
-      action: "Safety Strobe pulsed: Cyclist safely diverted",
-      type: "vehicle"
-    },
-    {
-      id: 3,
-      zone: "GROUND LEVEL",
-      name: "Deep Pothole (0.8m drop)",
-      time: "11 mins ago",
-      action: "Urgent STOP haptic triggered: Collision avoided",
-      type: "ground"
-    }
-  ];
+  const previewButton = useRef<HTMLButtonElement>(null);
+  const userLocation = {
+    lat: "Unknown", lng: "Unknown", address: "No device location received",
+    battery: "Unknown", speed: "Unknown", heading: "Unknown"
+  };
+  const recentHazards: {id: number; zone: string; name: string; time: string; action: string; type: string}[] = [];
+  function closePreview() {
+    setActiveSOS(false);
+    previewButton.current?.focus();
+  }
 
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-6">
@@ -65,56 +38,63 @@ export default function CaretakerDashboard() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Netra Saathi Guardian</h1>
-            <p className="text-sm text-gray-400">Live Caretaker Telemetry & Emergency Command</p>
+            <p className="text-sm text-gray-400">Guardian dashboard · no device connected</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-700/50 text-emerald-400 text-sm">
-            <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-            <span>Pedestrian Live Stream: Online</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-700 text-gray-300 text-sm">
+            <Radio className="w-3.5 h-3.5 text-gray-400" />
+            <span role="status">Telemetry unavailable · no device paired</span>
           </div>
 
           <button
+            ref={previewButton}
+            aria-expanded={activeSOS}
+            aria-controls="alert-preview"
             onClick={() => setActiveSOS(!activeSOS)}
             className={`px-4 py-2 rounded-xl font-semibold flex items-center gap-2 transition ${
               activeSOS
-                ? "bg-red-600 text-white animate-pulse"
+                ? "bg-red-600 text-white animate-pulse motion-reduce:animate-none"
                 : "bg-gray-800 hover:bg-gray-700 text-gray-300"
             }`}
           >
             <ShieldAlert className="w-4 h-4" />
-            {activeSOS ? "SOS BROADCAST ACTIVE" : "Simulate SOS"}
+            {activeSOS ? "Close alert preview" : "Test local alert preview"}
           </button>
         </div>
       </header>
 
       {/* SOS Alert Banner */}
       {activeSOS && (
-        <div className="bg-red-500/10 border-2 border-red-500 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-bounce">
+        <div id="alert-preview" role="alert" className="bg-red-500/10 border-2 border-red-500 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-bounce motion-reduce:animate-none">
           <div className="flex items-center gap-3 text-red-400">
             <ShieldAlert className="w-8 h-8 flex-shrink-0" />
             <div>
-              <h3 className="text-lg font-bold">EMERGENCY ALERT: USER TRIGGERED SOS</h3>
+              <h3 className="text-lg font-bold">LOCAL ALERT PREVIEW</h3>
               <p className="text-sm text-red-300">
-                Triple-tap SOS confirmed at {userLocation.address}. Dispatching automated notification.
+                This is a local preview. No user SOS was received and no notification is sent.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <button className="flex-1 md:flex-none px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2">
-              <PhoneCall className="w-4 h-4" /> Call User Directly
+            <button disabled aria-describedby="connection-limits" className="disabled:opacity-50 flex-1 md:flex-none px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2">
+              <PhoneCall className="w-4 h-4" /> Calling unavailable
             </button>
             <button
-              onClick={() => setActiveSOS(false)}
+              onClick={closePreview}
               className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl"
             >
-              Acknowledge
+              Close preview
             </button>
           </div>
         </div>
       )}
 
+      <p id="connection-limits" className="text-sm text-gray-300" role="note">
+        Live location, guardian notifications, fall detection and remote commands are not connected.
+        Controls remain unavailable until these services exist. This dashboard cannot monitor an emergency.
+      </p>
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Live Location & Telemetry */}
@@ -124,31 +104,21 @@ export default function CaretakerDashboard() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-blue-400" />
-                <h2 className="font-semibold text-lg">Live Footpath Navigation Tracking</h2>
+                <h2 className="font-semibold text-lg">Device location</h2>
               </div>
               <span className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-md">
-                MapLibre / GPS Lock ±1.2m
+                No GPS fix received
               </span>
             </div>
 
             {/* Map Canvas Placeholder */}
             <div className="h-72 w-full bg-[#0d131f] rounded-xl border border-gray-800/80 relative flex items-center justify-center overflow-hidden">
-              <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]" />
               
-              {/* User Marker */}
-              <div className="relative flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center animate-ping absolute" />
-                <div className="w-9 h-9 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center shadow-lg shadow-blue-500/50 z-10">
-                  <Navigation className="w-5 h-5 text-white transform -rotate-45" />
-                </div>
-                <div className="mt-2 bg-gray-900/90 backdrop-blur px-3 py-1 rounded-full border border-gray-700 text-xs font-medium text-gray-200 z-10">
-                  Rahul (User) • 0.8 m/s
-                </div>
-              </div>
+              <p className="p-6 text-center text-gray-300">Location unavailable. No device telemetry is connected.</p>
 
               {/* Map Footer Info */}
               <div className="absolute bottom-3 left-3 right-3 bg-gray-900/80 backdrop-blur border border-gray-800 p-2.5 rounded-lg flex justify-between text-xs text-gray-400">
-                <span>📍 {userLocation.address}</span>
+                <span>{userLocation.address}</span>
                 <span>Lat: {userLocation.lat} | Lng: {userLocation.lng}</span>
               </div>
             </div>
@@ -166,21 +136,21 @@ export default function CaretakerDashboard() {
                 <div className="text-xs text-gray-400 flex items-center gap-1.5">
                   <Activity className="w-4 h-4 text-blue-400" /> Speed & Gait
                 </div>
-                <div className="text-lg font-bold text-gray-100 mt-1">Normal Walk</div>
+                <div className="text-lg font-bold text-gray-100 mt-1">Unknown</div>
               </div>
 
               <div className="bg-gray-900/50 border border-gray-800 p-3 rounded-xl">
                 <div className="text-xs text-gray-400 flex items-center gap-1.5">
                   <Flashlight className="w-4 h-4 text-yellow-400" /> Safety Strobe
                 </div>
-                <div className="text-lg font-bold text-yellow-400 mt-1">Strobe Active</div>
+                <div className="text-lg font-bold text-yellow-400 mt-1">Unknown</div>
               </div>
 
               <div className="bg-gray-900/50 border border-gray-800 p-3 rounded-xl">
                 <div className="text-xs text-gray-400 flex items-center gap-1.5">
                   <ShieldAlert className="w-4 h-4 text-emerald-400" /> Fall Detector
                 </div>
-                <div className="text-lg font-bold text-emerald-400 mt-1">Armed & Safe</div>
+                <div className="text-lg font-bold text-gray-300 mt-1">Unavailable</div>
               </div>
             </div>
           </div>
@@ -194,10 +164,11 @@ export default function CaretakerDashboard() {
               <h2 className="font-semibold text-lg flex items-center gap-2">
                 <Bell className="w-5 h-5 text-yellow-400" /> 3-Zone Obstacle Log
               </h2>
-              <span className="text-xs text-gray-400">Live Telemetry</span>
+              <span className="text-xs text-gray-400">No telemetry received</span>
             </div>
 
             <div className="space-y-3">
+              {recentHazards.length === 0 && <p className="text-sm text-gray-300">No hazard data received. This does not mean the path is safe.</p>}
               {recentHazards.map((item) => (
                 <div
                   key={item.id}
@@ -227,22 +198,22 @@ export default function CaretakerDashboard() {
           {/* Remote Guardian Assistance */}
           <div className="bg-[#111827] border border-gray-800 rounded-2xl p-5 space-y-4">
             <h2 className="font-semibold text-lg flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-400" /> Remote Settings
+              <User className="w-5 h-5 text-blue-400" /> Remote settings · unavailable
             </h2>
             <div className="space-y-2 text-sm text-gray-300">
               <label className="flex items-center justify-between p-2 rounded-lg bg-gray-900/60 border border-gray-800 cursor-pointer">
                 <span>Active Safety Strobe Beacon</span>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
+                <input type="checkbox" disabled aria-describedby="connection-limits" className="w-4 h-4 text-blue-600 rounded" />
               </label>
 
               <label className="flex items-center justify-between p-2 rounded-lg bg-gray-900/60 border border-gray-800 cursor-pointer">
                 <span>Head-Height Hazard Alerts</span>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
+                <input type="checkbox" disabled aria-describedby="connection-limits" className="w-4 h-4 text-blue-600 rounded" />
               </label>
 
               <label className="flex items-center justify-between p-2 rounded-lg bg-gray-900/60 border border-gray-800 cursor-pointer">
                 <span>Harvard Mobilio Spatial Sonar</span>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
+                <input type="checkbox" disabled aria-describedby="connection-limits" className="w-4 h-4 text-blue-600 rounded" />
               </label>
             </div>
           </div>

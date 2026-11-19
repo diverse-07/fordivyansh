@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Netra Saathi — Caretaker Live Dashboard",
-  description: "Real-time pedestrian tracking, 3-zone hazard feed, and SOS alert monitoring for Netra Saathi guardians.",
+  title: "Netra Saathi - Guardian Dashboard",
+  description: "Netra Saathi guardian interface. Live telemetry and notifications are currently unavailable.",
 };
 
 export default function RootLayout({

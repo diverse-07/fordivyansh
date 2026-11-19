@@ -10,6 +10,7 @@ data class NavigationUiState(
     val gatewayUrl: String = "",
     val gatewayAccess: String = "",
     val cloudConsent: Boolean = false,
+    val surroundingsConsent: Boolean = false,
     val gatewayMessage: String = "",
     val pendingNavigation: Boolean = false,
     val destinationDialog: Boolean = false,

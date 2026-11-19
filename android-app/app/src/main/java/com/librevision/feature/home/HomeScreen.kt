@@ -25,6 +25,14 @@ import com.librevision.data.models.SetupPhase
 
 private data class HomeAction(val label: String, val icon: Int, val screen: Screen)
 
+private fun openHomeAction(model: LibreVisionViewModel, action: HomeAction) {
+    when (action.screen) {
+        Screen.SCENE -> model.describe()
+        Screen.TRAINING -> model.startAudioTraining()
+        else -> model.open(action.screen)
+    }
+}
+
 @Composable
 fun HomeScreen(model: LibreVisionViewModel, state: UiState) {
     val colors = LocalIndustrialColors.current
@@ -86,7 +94,7 @@ fun HomeScreen(model: LibreVisionViewModel, state: UiState) {
             if (rows)
                 actions.forEachIndexed { index, item ->
                     HomeKey(item, index, Modifier.fillMaxWidth().heightIn(min = 80.dp), true) {
-                        model.open(item.screen)
+                        openHomeAction(model, item)
                     }
                 }
             else
@@ -99,7 +107,7 @@ fun HomeScreen(model: LibreVisionViewModel, state: UiState) {
                                 Modifier.weight(1f).aspectRatio(1f),
                                 false,
                             ) {
-                                model.open(item.screen)
+                                openHomeAction(model, item)
                             }
                         }
                     }
@@ -171,7 +179,7 @@ fun HomeScreen(model: LibreVisionViewModel, state: UiState) {
                 }
                 Text("Ask Saathi AI", fontSize = 23.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (state.handsFree) "Hey Saathi" else "Tap to speak",
+                    if (state.handsFree) "Hey Vision" else "Tap to speak",
                     fontSize = 18.sp,
                     color = colors.secondary,
                 )

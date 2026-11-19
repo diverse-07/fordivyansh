@@ -73,6 +73,7 @@ data class UiState(
     val scene: String = "Requires internet. Only a selected image is sent with your permission.",
     val hasSceneDescription: Boolean = false,
     val cue: String = "Choose a cue to practice.",
+    val audioTrainingReady: Boolean = false,
     val largeText: Boolean = false,
     val nightMode: Boolean = false,
     val detailed: Boolean = false,
@@ -86,6 +87,7 @@ data class UiState(
     val depthMessage: String = "Estimated distance unavailable.",
     val speechAvailable: Boolean = true,
     val speechIssue: String? = null,
+    val speechEngineUnavailable: Boolean = false,
     val microphoneDenied: Boolean = false,
     val settingsExpanded: Boolean = false,
 )
@@ -96,6 +98,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun foreground() {
         foreground = true
+        speech.reconnect()
         announceWelcomeStage()
         resumeHandsFreeIfReady()
         if (state.value.screen == Screen.NAVIGATION) {
@@ -125,7 +128,8 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
     fun triggerEmergencyLoudspeakerAlarm(): Boolean {
         val active = emergencyAlarm.toggle()
         if (active) {
-            mutable.update { it.copy(message = "LOUDSPEAKER SOS ALARM ACTIVE!") }
+            if (audioTrainingJob?.isActive == true) stopAudio()
+            mutable.update { it.copy(message = "Local emergency siren active. No guardian notification is sent.") }
         } else {
             announce("Emergency alarm stopped.", Priority.ROUTINE)
         }
@@ -209,6 +213,8 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
     private var sceneReplyForListening: String? = null
     private var assistantReplyForListening: String? = null
     private var pendingTurnCue: Pair<String, FeedbackCue>? = null
+    private var audioTrainingJob: Job? = null
+    private var trainingNarration: Pair<String, CompletableDeferred<Unit>>? = null
     private val feedbackCues =
         FeedbackCues(application) { active ->
                 cuePlaying = active
@@ -230,6 +236,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             },
             { mutable.update { it.copy(speechAvailable = true, speechIssue = null) } },
             voiceCommands::rememberPlaybackText,
+            { missing -> mutable.update { it.copy(speechEngineUnavailable = missing) } },
         )
     private val alerts: AlertCoordinator = AlertCoordinator(speech)
     private val commands = VoiceCommandRouter()
@@ -286,6 +293,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 gatewayUrl = gateway.url,
                 gatewayAccess = gateway.access,
                 cloudConsent = gateway.consent,
+                surroundingsConsent = gateway.surroundingsConsent,
             )
         )
     val navigationState = nav.asStateFlow()
@@ -358,6 +366,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                             footpath = scan.message,
                         )
                     }
+                    spatialSonar.pause()
                     tiltProvider.stop()
                     announce("Scanning stopped. Camera or model unavailable.", Priority.URGENT)
                 } else if (scan.phase == ScanPhase.PREPARING)
@@ -373,6 +382,10 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                     depthMatcher.record(observation)
                     val now = SystemClock.elapsedRealtime()
                     val relevant = obstructionPolicy.select(observation.detections).take(1)
+                    val sonarTarget = relevant.firstOrNull()
+                    if (sonarTarget != null && now - observation.timestampMs in 0..1500) {
+                        sonarTarget.bounds?.let { box -> spatialSonar.updateSteering(box.left + box.right - 1f, null) }
+                    } else spatialSonar.clearTarget()
                     evidence.update(observation, relevant, now)
                     val result = temporal.consume(observation.copy(detections = relevant), now)
                     val warning =
@@ -418,7 +431,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 speakCurrentGuidance()
                 speakContext()
                 speakAssistant()
-                voiceCommands.tick(state.value.handsFree)
+                voiceCommands.tick(state.value.handsFree || audioTrainingJob?.isActive == true)
                 val awaitingFollowup = voiceCommands.awaitingCommand()
                 assistant.update {
                     if (
@@ -475,6 +488,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun testSpeech() {
         alerts.stop()
+        speech.reconnect(force = true)
         speech.language(false)
         alerts.offer(Alert("Netra Saathi speech is working.", Priority.URGENT))
     }
@@ -485,10 +499,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         now: Long,
     ): DepthDistance? {
         if (!state.value.depthEnabled) return null
-        val frame =
-            scanner.depth.value.frame?.takeIf { it.timestampMs == observation.timestampMs }
-                ?: return null
-        return detection.bounds?.let { frame.estimate(it, now) }
+        return depthMatcher.estimate(scanner.depth.value.frame, detection, now)
     }
 
     private fun obstacleMessage(detection: Detection, observation: Observation, now: Long) =
@@ -497,6 +508,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             distanceFor(detection, observation, now),
             state.value.stepLength,
             now,
+            state.value.bangla,
         )
 
     private fun maybeSpeakObstacle() {
@@ -514,20 +526,9 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         )
             return
 
-        // Vehicle alert audio/haptic alert handled via alerts.offer below; torch flashing disabled
-        val depthEst = distanceFor(primary, observation, now)
-        val depthMeters = depthEst?.meters ?: 2.0f
-        val box = primary.bounds
-        val top = box?.top ?: 0.5f
-        val bottom = box?.bottom ?: 0.8f
-        val centerX = if (box != null) (box.left + box.right) / 2f else 0.5f
-        val lateralOffset = (centerX - 0.5f) * 2.0f
-        spatialSonar.updateSteering(lateralOffset, depthMeters)
-
-        val hazard = hazardClassifier.classifyHazard(primary.label, top, bottom, centerX, depthMeters)
-        val message = hazard.spokenWarning
-        speech.language(false)
-        val isCritical = hazard.severity == HazardSeverity.CRITICAL || traffic
+        val message = obstacleMessage(primary, observation, now)
+        speech.language(state.value.bangla)
+        val isCritical = true
         if (!alerts.offer(Alert(message, if (traffic) Priority.TRAFFIC else (if (isCritical) Priority.URGENT else Priority.ROUTINE))))
             return
         playCue(FeedbackCue.OBSTACLE, urgent = isCritical)
@@ -551,7 +552,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 (lastDepthAt != Long.MIN_VALUE && now - lastDepthAt < 8000)
         )
             return
-        val message = ObstacleSpeech.message(primary.label, distance, state.value.stepLength, now)
+        val message = ObstacleSpeech.message(primary.label, distance, state.value.stepLength, now, state.value.bangla)
         if ("Estimated." !in message) return
         speech.language(false)
         if (!alerts.offerRefinement(Alert(message, Priority.URGENT))) return
@@ -1002,7 +1003,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         pendingImageQuestion = question.take(500)
         if (!gateway.consent) {
             nav.update { it.copy(contextConsent = true) }
-            feedback("May I send one camera image to Meta? Say Send image or Cancel image.")
+            feedback("May I send one camera image to Google Gemini? Say Send image or Cancel image.")
             return
         }
         beginVisualQuestion()
@@ -1304,6 +1305,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         }
         scanner.captureOnly = preserveScene && state.value.screen == Screen.SCENE
         scanner.start()
+        spatialSonar.isEnabled = state.value.soundCues
         spatialSonar.start()
     }
 
@@ -1368,6 +1370,9 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun voice() {
         cancelAssistant()
+        pendingFeedback = null
+        if (audioTrainingJob?.isActive == true && !state.value.audioTrainingReady) stopAudio()
+        alerts.cancelRoutine()
         voiceCommands.openDictationWindow()
         mutable.update { it.copy(voiceOpen = true, message = "", voice = VoiceState.LISTENING) }
         if (assistant.value.phase != AssistantPhase.THINKING)
@@ -1461,38 +1466,19 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             pcm?.fill(0)
             return
         }
-        val command = commands.interpret(event.transcript)
-        val bareWake =
-            AppSpeechPhrases.wakePhrases.any {
-                CommandInterpreter().normalize(event.transcript) == it
-            }
         cancelSpeechFallback()
         val afterWake =
             AppSpeechPhrases.wakePattern
                 .replaceFirst(CommandInterpreter().normalize(event.transcript), "")
                 .trim()
-        val stop = commands.interpret(afterWake)
-        if (
-            stop in
-                setOf(
-                    Command.STOP,
-                    Command.STOP_SCANNING,
-                    Command.STOP_NAVIGATION,
-                    Command.STOP_LISTENING,
-                )
-        ) {
-            pcm?.fill(0)
-            cancelAssistant()
-            executeCommand(stop, afterWake)
-            voiceCommands.finishCommand(event.activationId)
-            return
-        }
+        val command = commands.interpret(afterWake)
+        val matchedControl = VoiceControls.match(afterWake, voiceControlActions().map { it.first })
         if (
             event.wakeOnly ||
-                bareWake ||
                 pcm == null ||
                 !gateway.audioConsent ||
-                VoiceControls.match(afterWake, voiceControlActions().map { it.first }) != null ||
+                matchedControl?.id == "training_ready" ||
+                ((event.confidence ?: 0f) >= .8f && matchedControl != null) ||
                 !SpeechFallbackPolicy.needsAudio(
                     DecodedSpeech(event.transcript, event.confidence),
                     command,
@@ -1501,7 +1487,12 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             pcm?.fill(0)
             mutable.update { it.copy(message = "") }
             try {
-                handleVoice(event.transcript, event.wakeOnly)
+                if (event.transcript.isBlank()) {
+                    speechFailure(
+                        if (gateway.audioConsent) "No words were recognized. Please try again."
+                        else "No words were recognized offline. Try a short English command or enable Online speech fallback in Settings."
+                    )
+                } else handleVoice(event.transcript, event.wakeOnly, acknowledgeProcessing = true)
             } finally {
                 voiceCommands.finishCommand(event.activationId)
             }
@@ -1523,6 +1514,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         }
         voiceJob = viewModelScope.launch {
             try {
+                acknowledgeVoiceProcessing()
                 val text = audioTranscriber.transcribe(pcm).getOrThrow()
                 if (
                     !foreground ||
@@ -1533,25 +1525,8 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 )
                     return@launch
                 mutable.update { it.copy(voice = VoiceState.SUCCESS, message = "") }
-                val intent = commands.interpret(text)
-                if (activateVoiceControl(text)) {
-                    // Local button controls take precedence over a place-search fallback.
-                } else if (
-                    intent == Command.UNKNOWN &&
-                        state.value.screen == Screen.NAVIGATION &&
-                        nav.value.destinationDialog &&
-                        !Regex("(?i)^(where|what|how|why|can|could|please|help|hey)\\b")
-                            .containsMatchIn(text.trim())
-                ) {
-                    updateQuery(text)
-                    searchDestinations(voice = true)
-                } else if (
-                    intent == Command.UNKNOWN &&
-                        !AppSpeechPhrases.hasWake(text) &&
-                        !voiceActivation.awaiting(SystemClock.elapsedRealtime())
-                ) {
-                    askMuse(text)
-                } else handleVoice(text, false)
+                // Recognition already played the cue for this utterance.
+                handleVoice(text, false)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -1582,32 +1557,45 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun describe() {
-        if (surroundingsState.value.phase == SurroundingsPhase.CAPTURING) {
-            finishSurroundingsRecording()
-            return
-        }
+        if (!foreground) return
         if (
             surroundingsState.value.phase in
-                setOf(SurroundingsPhase.PREPARING, SurroundingsPhase.EXTRACTING)
+                setOf(SurroundingsPhase.PREPARING, SurroundingsPhase.CAPTURING,
+                    SurroundingsPhase.EXTRACTING, SurroundingsPhase.ANALYZING, SurroundingsPhase.CONSENT)
         )
             return
         if (state.value.screen != Screen.SCENE) open(Screen.SCENE)
-        if (
-            surroundingsState.value.phase == SurroundingsPhase.ERROR && surroundingsSession.hasViews
-        ) {
-            askSurroundings(INITIAL_SURROUNDINGS_QUESTION, true)
+        if (gateway.surroundingsConsent) {
+            startSurroundingsCapture()
             return
         }
         cancelAssistant()
         surroundingsSession.requestConsent()
         val disclosure =
-            "Record a video of your surroundings. Twelve pictures will go to Meta. Say Start recording, or Cancel capture."
+            "Allow Saathi to send selected pictures to Google Gemini? Say Allow and describe, or Cancel."
         sceneReplyForListening = disclosure
         feedback(disclosure)
     }
 
     fun confirmSurroundingsCapture() {
         if (surroundingsState.value.phase != SurroundingsPhase.CONSENT) return
+        setSurroundingsConsent(true)
+        startSurroundingsCapture()
+    }
+
+    fun setSurroundingsConsent(allowed: Boolean) {
+        gateway.surroundingsConsent = allowed
+        nav.update { it.copy(surroundingsConsent = allowed) }
+        if (!allowed) clearSurroundings()
+    }
+
+    fun retrySurroundingsDescription() {
+        if (gateway.surroundingsConsent && surroundingsSession.hasViews)
+            askSurroundings(INITIAL_SURROUNDINGS_QUESTION, true)
+        else describe()
+    }
+
+    private fun startSurroundingsCapture() {
         cancelAssistantWork()
         pendingFeedback = null
         alerts.cancelRoutine()
@@ -1623,7 +1611,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             var recorded: com.librevision.data.scene.RecordedSceneVideo? = null
             try {
                 previous?.cancelAndJoin()
-                recorded = sceneVideo.record()
+                recorded = sceneVideo.record(VideoFramePlan.AUTO_CAPTURE_MS)
                 surroundingsSession.extracting()
                 val selected = videoFrames.extract(recorded.file, recorded.endedAtMs)
                 surroundingsSession.useVideo(selected)
@@ -1704,7 +1692,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 .containsMatchIn(query)
 
     private fun askSurroundings(question: String, initial: Boolean = false) {
-        if (!foreground || !surroundingsSession.hasViews) return
+        if (!foreground || !gateway.surroundingsConsent || !surroundingsSession.hasViews) return
         val ticket = voiceCommands.holdDictationWindow()
         assistantJob?.cancel()
         val epoch = ++assistantEpoch
@@ -1762,6 +1750,9 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
     private fun speechFinished() {
         val completed = alerts.currentAlert()
         alerts.finished()
+        trainingNarration?.let { (text, completion) ->
+            if (completed?.text == text) completion.complete(Unit)
+        }
         if (tourUtterance != null && completed?.text == tourUtterance) {
             tourUtterance = null
             if (!state.value.speechAvailable) welcomeFlow.pause()
@@ -1799,10 +1790,18 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         feedbackCues.play(cue, withSound = !alerts.isSpeaking())
     }
 
+    private fun acknowledgeVoiceProcessing() {
+        if (!state.value.soundCues || speechPlaying || alerts.isSpeaking() ||
+            emergencyAlarm.isAlarmActive.get()
+        ) return
+        playCue(FeedbackCue.PROCESSING)
+    }
+
     fun feedbackSettings(
         sound: Boolean = state.value.soundCues,
         haptics: Boolean = state.value.haptics,
     ) {
+        spatialSonar.isEnabled = sound
         feedbackCues.soundEnabled = sound
         feedbackCues.hapticsEnabled = haptics
         mutable.update { it.copy(soundCues = sound, haptics = haptics) }
@@ -1811,7 +1810,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
 
     companion object {
         private const val INITIAL_SURROUNDINGS_QUESTION =
-            "Give a concise initial overview of the most useful things in these surroundings for a visually impaired person. Prioritize relevant obstructions, footpath layout, traffic and useful landmarks. Omit small irrelevant details."
+            "In one or two short sentences, describe what is visible in front of the camera. Prioritize relevant obstructions, footpath layout, traffic and useful landmarks. Mention each item once. Omit recording details."
     }
 
     fun replayScene() {
@@ -1856,13 +1855,27 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         handleVoice(text, false)
     }
 
-    private fun handleVoice(text: String, wakeOnly: Boolean) {
-        if (!foreground || text.isBlank()) return
+    private fun handleVoice(
+        spoken: String,
+        wakeOnly: Boolean,
+        acknowledgeProcessing: Boolean = false,
+    ) {
+        if (!foreground || spoken.isBlank()) return
         val now = SystemClock.elapsedRealtime()
-        if (!wakeOnly && !AppSpeechPhrases.hasWake(text) && activateVoiceControl(text)) return
+        val text = when (val decision = voiceActivation.decide(spoken, now, wakeOnly)) {
+            MuseVoiceDecision.Ignore -> return
+            MuseVoiceDecision.Wake -> {
+                wakeMuse()
+                return
+            }
+            is MuseVoiceDecision.Ask -> decision.question
+            MuseVoiceDecision.Local -> spoken
+        }
+        if (text.isBlank()) return
+        if (activateVoiceControl(text)) return
+        val localCommand = commands.interpret(text)
         if (
-            !wakeOnly &&
-                commands.interpret(text) in
+            localCommand in
                     setOf(
                         Command.STOP,
                         Command.STOP_SCANNING,
@@ -1872,11 +1885,11 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         ) {
             voiceActivation.clear()
             cancelAssistant()
-            executeCommand(commands.interpret(text), text)
+            executeCommand(localCommand, text)
             return
         }
-        if (!wakeOnly && surroundingsState.value.phase == SurroundingsPhase.CONSENT) {
-            when (commands.interpret(text)) {
+        if (surroundingsState.value.phase == SurroundingsPhase.CONSENT) {
+            when (localCommand) {
                 Command.START_SCENE_RECORDING,
                 Command.CONFIRM_IMAGE_UPLOAD -> {
                     confirmSurroundingsCapture()
@@ -1889,65 +1902,38 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 else -> Unit
             }
         }
-        if (!wakeOnly && nav.value.contextConsent) {
-            val consentCommand = commands.interpret(text)
-            if (consentCommand == Command.CONFIRM_IMAGE_UPLOAD) {
+        if (nav.value.contextConsent) {
+            if (localCommand == Command.CONFIRM_IMAGE_UPLOAD) {
                 confirmContextConsent()
                 return
             }
-            if (consentCommand == Command.CANCEL_IMAGE_UPLOAD) {
+            if (localCommand == Command.CANCEL_IMAGE_UPLOAD) {
                 dismissContextConsent()
                 return
             }
         }
         // Follow-up controls such as Go and Next destination stay deterministic, including after
         // wake.
-        val localCommand = commands.interpret(text)
-        if (!wakeOnly && !AppSpeechPhrases.hasWake(text) && localCommand != Command.UNKNOWN) {
+        if (localCommand != Command.UNKNOWN) {
             voiceActivation.clear()
             executeCommand(localCommand, text)
             return
         }
-        if (
-            !wakeOnly &&
-                !AppSpeechPhrases.hasWake(text) &&
-                localCommand == Command.UNKNOWN &&
-                sceneQuestion(text)
-        ) {
+        if (acknowledgeProcessing) acknowledgeVoiceProcessing()
+        if (sceneQuestion(text)) {
             askSurroundings(text)
             return
         }
-        when (val decision = voiceActivation.decide(text, now, wakeOnly)) {
-            MuseVoiceDecision.Ignore -> return
-            MuseVoiceDecision.Wake -> {
-                wakeMuse()
-                return
-            }
-            is MuseVoiceDecision.Ask -> {
-                val local = commands.interpret(decision.question)
-                if (!activateVoiceControl(decision.question)) {
-                    if (local != Command.UNKNOWN) executeCommand(local, decision.question)
-                    else {
-                        wakeMuse()
-                        askMuse(decision.question)
-                    }
-                }
-                return
-            }
-            MuseVoiceDecision.Local -> Unit
-        }
-        val command = commands.interpret(text)
-        if (command == Command.UNKNOWN) {
-            mutable.update { it.copy(voiceOpen = true) }
-            askMuse(text)
+        if (state.value.screen == Screen.NAVIGATION && nav.value.destinationDialog &&
+            !Regex("(?i)^(where|what|how|why|who|when|can|could|would|please|help|hey|tell|show|do|is|are|i)\\b")
+                .containsMatchIn(text.trim())
+        ) {
+            updateQuery(text)
+            searchDestinations(voice = true)
             return
         }
-        mutable.update {
-            it.copy(
-                voice = if (command == Command.UNKNOWN) VoiceState.FAILURE else VoiceState.SUCCESS
-            )
-        }
-        executeCommand(command, text)
+        mutable.update { it.copy(voiceOpen = true) }
+        askMuse(text)
     }
 
     private val pageHistory = ArrayDeque<Screen>()
@@ -1986,7 +1972,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             return@buildList
         }
         if (surroundingsState.value.phase == SurroundingsPhase.CONSENT) {
-            key("record", "Start recording", action = ::confirmSurroundingsCapture)
+            key("record", "Allow and describe", "start recording", action = ::confirmSurroundingsCapture)
             key("cancel", "Cancel", action = ::dismissSurroundingsConsent)
             return@buildList
         }
@@ -2016,8 +2002,8 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
             Screen.HOME -> {
                 key("navigate", "Navigate", "navigation") { open(Screen.NAVIGATION) }
                 key("footpath", "Check Footpath") { open(Screen.FOOTPATH) }
-                key("surroundings", "Describe Surroundings") { open(Screen.SCENE) }
-                key("training", "Learn Audio Cues", "audio cues") { open(Screen.TRAINING) }
+                key("surroundings", "Describe Surroundings", action = ::describe)
+                key("training", "Learn Audio Cues", "audio cues", action = ::startAudioTraining)
             }
             Screen.NAVIGATION -> {
                 key("search", "Search") {
@@ -2083,7 +2069,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                     SurroundingsPhase.ANALYZING ->
                         key("cancel", "Cancel", action = ::cancelSceneQuestion)
                     else -> {
-                        key("record", "Record video", "describe surroundings", action = ::describe)
+                        key("record", "Describe surroundings", "record video", action = ::describe)
                         if (
                             !state.value.voiceOpen &&
                                 state.value.hasSceneDescription &&
@@ -2094,6 +2080,9 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 }
             }
             Screen.TRAINING -> {
+                if (state.value.audioTrainingReady)
+                    key("training_ready", "Yes, I am ready", "yes i'm ready", "i am ready", "i'm ready", "ready",
+                        action = ::finishAudioTraining)
                 listOf(
                         "Listening" to FeedbackCue.LISTENING,
                         "Turn left" to FeedbackCue.TURN_LEFT,
@@ -2154,7 +2143,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 key("retry_setup", "Retry model setup", action = ::retryModelSetup)
             }
         }
-        key("ask", "Ask Muse", "voice command", action = ::wakeMuse)
+        key("ask", "Ask Saathi", "ask muse", "ask saathi ai", "voice command", action = ::wakeMuse)
     }
 
     fun toggleSettingsExpanded() {
@@ -2162,35 +2151,39 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     private fun activateVoiceControl(text: String): Boolean {
-        val normalized = CommandInterpreter().normalize(text)
         val actions = voiceControlActions()
         val match = VoiceControls.match(text, actions.map { it.first }) ?: return false
+        runVoiceControl(actions.single { it.first.id == match.id }, text)
+        return true
+    }
+
+    private fun runVoiceControl(binding: Pair<VoiceControl, () -> Unit>, spoken: String) {
+        val (control, action) = binding
+        val normalized = CommandInterpreter().normalize(spoken)
         // Dismiss the assistant sheet when operating the page beneath it; keep consent sheets.
         if (
             state.value.voiceOpen &&
-                (match.id !in
+                (control.id !in
                     setOf(
                         "back",
                         "ask",
                         "assistant_speak",
                         "assistant_replay",
                         "assistant_cancel",
-                    ) || (match.id == "back" && normalized !in setOf("close", "close dialog")))
+                    ) || (control.id == "back" && normalized !in setOf("close", "close dialog")))
         ) {
             // Operating a page must not revoke the already authorized follow-up window.
             cancelAssistantWork()
             mutable.update { it.copy(voiceOpen = false) }
         }
-        actions.single { it.first == match }.second()
+        action()
         if (
-            match.id in
+            control.id in
                 setOf(
                     "home",
                     "settings",
                     "navigate",
                     "footpath",
-                    "surroundings",
-                    "training",
                     "standard_text",
                     "large_text",
                     "night",
@@ -2202,8 +2195,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                     "more_settings",
                 )
         )
-            feedback("${match.label}.")
-        return true
+            feedback("${control.label}.")
     }
 
     private fun positionContext(): org.json.JSONObject {
@@ -2557,7 +2549,7 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 val control = voiceControlActions().singleOrNull { it.first.id == action.value }
                 if (control == null) acknowledge("That control is not available here.")
                 else {
-                    activateVoiceControl(control.first.label)
+                    runVoiceControl(control, control.first.label)
                     "${control.first.label}."
                 }
             }
@@ -2580,8 +2572,14 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 "Searching for ${action.query}."
             }
             MuseActionKind.OPEN_SCREEN -> {
-                open(Screen.valueOf(action.value!!))
-                acknowledge("${action.value.lowercase().replace('_',' ')} opened.")
+                val screen = Screen.valueOf(action.value!!)
+                if (screen == Screen.TRAINING) {
+                    startAudioTraining()
+                    "Audio cue practice started."
+                } else {
+                    open(screen)
+                    acknowledge("${action.value.lowercase().replace('_',' ')} opened.")
+                }
             }
             MuseActionKind.START_SCANNING -> {
                 scan()
@@ -2736,10 +2734,9 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                 if (state.value.screen != Screen.NAVIGATION) commandScreen(Screen.NAVIGATION)
             Command.CHECK_FOOTPATH -> commandScreen(Screen.FOOTPATH)
             Command.DESCRIBE_SCENE -> {
-                commandScreen(Screen.SCENE)
                 describe()
             }
-            Command.LEARN_AUDIO_CUES -> commandScreen(Screen.TRAINING)
+            Command.LEARN_AUDIO_CUES -> startAudioTraining()
             Command.STOP -> {
                 cancelNavigationRequest()
                 pendingFeedback = null
@@ -2754,10 +2751,18 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
                     replayScene()
                 else alerts.replay()
             Command.HELP -> {
-                val help =
-                    "Say a button name, Go back, or Home. You can ask where you are, find a destination, or ask any question."
-                feedback(help)
+                val local = voiceControlActions().map { it.first }
+                    .filter { it.id !in setOf("back", "home", "settings", "ask") && !it.id.startsWith("assistant_") }
+                    .map { it.label }.distinct().take(5)
+                val help = buildString {
+                    append("Ask a question or say what you want to do. Try “Find the nearest pharmacy” or “Make the text larger.”")
+                    if (local.isNotEmpty()) append(" On this screen you can say ${local.joinToString(", ")}.")
+                    append(" Say “Go back” to return.")
+                }
+                mutable.update { it.copy(voiceOpen = true, voice = VoiceState.SUCCESS, message = "") }
+                assistant.value = AssistantUiState(AssistantPhase.ANSWER, transcript, help)
                 assistantReplyForListening = help
+                feedback(help)
             }
             Command.EMERGENCY_ALARM -> {
                 triggerEmergencyLoudspeakerAlarm()
@@ -2770,16 +2775,59 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
         open(screen)
     }
 
+    fun startAudioTraining() {
+        if (!foreground || emergencyAlarm.isAlarmActive.get()) return
+        open(Screen.TRAINING)
+        voiceCommands.closeDictationWindow()
+        audioTrainingJob = viewModelScope.launch {
+            delay(200)
+            practiceAudioCues(::narrateTraining) { cue ->
+                feedbackCues.play(cue, practice = true)
+                delay(550)
+            }
+            mutable.update { it.copy(audioTrainingReady = true) }
+            voiceCommands.openDictationWindow()
+            startMicrophoneIfReady()
+            narrateTraining("Practice complete. Say Yes, I am ready to go home.")
+            voiceCommands.openDictationWindow()
+            voiceActivation.arm(SystemClock.elapsedRealtime())
+        }
+    }
+
+    private suspend fun narrateTraining(text: String) {
+        mutable.update { it.copy(cue = text) }
+        val completion = CompletableDeferred<Unit>()
+        trainingNarration = text to completion
+        speech.language(false)
+        try {
+            if (alerts.offer(Alert(text, Priority.ROUTINE))) {
+                withTimeoutOrNull(31000) { completion.await() }
+            }
+            delay(if (state.value.speechAvailable) 200 else 1100)
+        } finally {
+            if (trainingNarration?.second === completion) trainingNarration = null
+        }
+    }
+
+    fun finishAudioTraining() {
+        if (state.value.screen == Screen.TRAINING && state.value.audioTrainingReady) {
+            open(Screen.HOME)
+            feedback("Home.")
+        }
+    }
+
     fun cue(urgent: Boolean) =
         practiceCue(if (urgent) FeedbackCue.OBSTACLE else FeedbackCue.CONFIRMED)
 
     fun practiceCue(cue: FeedbackCue) {
+        if (audioTrainingJob?.isActive == true) stopAudio()
         mutable.update { it.copy(cue = "Practice: ${cue.label}.") }
         feedbackCues.play(cue)
         if (state.value.detailed) announce("Practice: ${cue.label}.")
     }
 
     fun vibrationCue() {
+        if (audioTrainingJob?.isActive == true) stopAudio()
         feedbackCues.play(FeedbackCue.CAPTURED, withSound = false)
         mutable.update { it.copy(cue = "Practice: a short tap.") }
     }
@@ -2787,12 +2835,16 @@ class LibreVisionViewModel(application: Application) : AndroidViewModel(applicat
     fun unavailableCue() = practiceCue(FeedbackCue.UNAVAILABLE)
 
     fun stopAudio() {
+        audioTrainingJob?.cancel()
+        audioTrainingJob = null
+        trainingNarration = null
         sceneReplyForListening = null
         pendingTurnCue = null
+        spatialSonar.pause()
         feedbackCues.stop()
         alerts.stop()
         getApplication<Application>().getSystemService(Vibrator::class.java)?.cancel()
-        mutable.update { it.copy(cue = "Audio and vibration stopped.") }
+        mutable.update { it.copy(cue = "Audio and vibration stopped.", audioTrainingReady = false) }
     }
 
     fun background() {

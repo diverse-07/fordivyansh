@@ -1,11 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "librevision-navigation-gateway",
+  "name": "netra-saathi-gemini-gateway",
   "main": "src/index.mjs",
   "compatibility_date": "2026-10-30",
   "workers_dev": true,
-  "observability": { "enabled": false },
-  "vars": { "LOCAL_ONLY": "false", "APP_ACCESS": "public" },
+  "observability": { "enabled": true },
+  "vars": { "LOCAL_ONLY": "false", "APP_ACCESS": "public", "AI_PROVIDER": "gemini", "DAILY_AI_LIMIT": "100" },
+  "durable_objects": { "bindings": [{ "name": "DAILY_BUDGET", "class_name": "DailyRequestBudget" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DailyRequestBudget"] }],
   "ratelimits": [
     {
       "name": "CLIENT_LIMITER",

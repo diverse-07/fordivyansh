@@ -1,3 +1,4 @@
+import { GEMINI_MODEL } from "./gemini.mjs";
 const MODEL = "muse-voice-transcribe-1.0";
 const MAX_WAV = 256044,
   MAX_COMPRESSED = 270000;
@@ -136,7 +137,7 @@ export async function transcribeAudio(
     if (text.length > 500 || /[\u0000-\u001f]/.test(text))
       return error("INVALID_TRANSCRIPTION", 502);
     return reply({
-      model: MODEL,
+      model: env.GEMINI_API_KEY ? GEMINI_MODEL : MODEL,
       text,
       audioDurationMs: (wav.length - 44) / 32,
       latencyMs: Date.now() - start,

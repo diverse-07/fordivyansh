@@ -198,4 +198,19 @@ class ListeningRepairTest {
         assertFalse(gate.suppressRecognition())
         assertNotEquals(version, gate.version())
     }
+
+    @Test
+    fun aReadyCueDoesNotCreateOrExtendTheSpeechSuppressionWindow() {
+        var time = 0L
+        val gate = RecognitionPlaybackGate { time }
+        gate.playback(false)
+        assertFalse(gate.suppressRecognition())
+        gate.playback(true)
+        gate.playback(false)
+        time = 500
+        gate.playback(false)
+        assertTrue(gate.suppressRecognition())
+        time = 601
+        assertFalse(gate.suppressRecognition())
+    }
 }

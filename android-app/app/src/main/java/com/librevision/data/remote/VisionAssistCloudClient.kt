@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
  * for 12-frame Surroundings video analysis, AI conversational Q&A, and SOS dispatch.
  */
 class VisionAssistCloudClient(
-    private var baseUrl: String = "http://10.0.2.2:8000"
+    private var baseUrl: String = ""
 ) {
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
@@ -25,6 +25,7 @@ class VisionAssistCloudClient(
         .build()
 
     fun updateBaseUrl(newUrl: String) {
+        require(GatewayConfiguration.validUrl(newUrl, false) && newUrl.isNotBlank())
         baseUrl = newUrl.trimEnd('/')
     }
 
@@ -48,18 +49,18 @@ class VisionAssistCloudClient(
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
+            val response = client.newCall(request).execute().also { if (!it.isSuccessful) { it.close(); error("Cloud request failed") } }
             if (!response.isSuccessful) {
                 throw Exception("Server returned HTTP ${response.code}: ${response.message}")
             }
 
-            val body = response.body?.string() ?: throw Exception("Empty response from server")
+            val body = response.use { it.body?.string() } ?: throw Exception("Empty response from server")
             val json = JSONObject(body).getJSONObject("data")
 
             SceneAnalysisResult(
                 speechSummary = json.getString("speech_summary"),
-                walkablePath = json.optString("walkable_path", "Clear path ahead"),
-                suggestedAction = json.optString("suggested_action", "continue_straight"),
+                walkablePath = json.optString("walkable_path", "Path safety unknown"),
+                suggestedAction = json.optString("suggested_action", "unknown"),
                 safetyBeaconNeeded = json.optBoolean("safety_beacon_needed", false),
                 beaconReason = json.optString("beacon_reason", "")
             )
@@ -76,8 +77,8 @@ class VisionAssistCloudClient(
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
-            val body = response.body?.string() ?: throw Exception("Empty response from assistant")
+            val response = client.newCall(request).execute().also { if (!it.isSuccessful) { it.close(); error("Cloud request failed") } }
+            val body = response.use { it.body?.string() } ?: throw Exception("Empty response from assistant")
             val json = JSONObject(body)
             json.getString("response")
         }
@@ -103,8 +104,8 @@ class VisionAssistCloudClient(
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
-            response.isSuccessful
+            val response = client.newCall(request).execute().also { if (!it.isSuccessful) { it.close(); error("Cloud request failed") } }
+            response.use { it.isSuccessful }
         }
     }
 }

@@ -143,7 +143,7 @@ class WelcomeFlow(initial: WelcomeSnapshot, private val save: (WelcomeSnapshot) 
                 ),
                 TourLesson(
                     "Voice commands",
-                    "Say Hey Saathi, then ask a question or name a feature. For example: Hey Saathi, check footpath. You have 18 seconds for follow-up commands. You can also tap the large microphone button.",
+                    "Say Hey Vision, then ask a question or name a feature. For example: Hey Vision, check footpath. You have 18 seconds for follow-up commands. You can also tap the large microphone button.",
                     TourIcon.MIC,
                 ),
                 TourLesson(
@@ -158,12 +158,12 @@ class WelcomeFlow(initial: WelcomeSnapshot, private val save: (WelcomeSnapshot) 
                 ),
                 TourLesson(
                     "Surroundings",
-                    "Tap Describe Surroundings. Agree to send selected pictures, record a video, then tap Finish recording. Netra Saathi AI gives a short overview. You can ask questions about the same video and replay the answer.",
+                    "Say Describe surroundings or tap its button. After you allow it, Saathi records a silent five-second clip, stops automatically, and describes what it sees. Twelve selected pictures go to Google Gemini. The clip is deleted, and pictures for follow-up questions clear when you leave the page or after five minutes.",
                     TourIcon.EYE,
                 ),
                 TourLesson(
                     "Ready cue",
-                    "A short rising chime and gentle tap confirm that the app is ready to listen. Hear a practice cue now. Learn Audio Cues lets you practise sounds and vibrations again.",
+                    "A short rising chime and gentle tap mean the app is ready to listen. Say Learn audio cues for guided practice. Saathi explains each cue and plays it three times. Say Yes, I am ready to go home.",
                     TourIcon.AUDIO,
                     FeedbackCue.LISTENING,
                 ),

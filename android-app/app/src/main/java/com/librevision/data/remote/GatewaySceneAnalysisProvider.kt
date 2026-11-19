@@ -59,6 +59,12 @@ class GatewayPreferences(context: Context) {
             prefs.edit().putBoolean("audioConsent", value).apply()
         }
 
+    var surroundingsConsent: Boolean
+        get() = prefs.getBoolean("surroundingsConsent", false)
+        set(value) {
+            prefs.edit().putBoolean("surroundingsConsent", value).apply()
+        }
+
     companion object {
         fun validGatewayUrl(value: String, debug: Boolean) =
             GatewayConfiguration.validUrl(value, debug)
@@ -133,7 +139,7 @@ class GatewaySceneAnalysisProvider(private val prefs: GatewayPreferences) : Scen
                                         continuation.resume(
                                             Result.failure(
                                                 IOException(
-                                                    "Muse is unreachable. Local alerts continue."
+                                                    "Cloud AI is unreachable. Local alerts continue."
                                                 )
                                             )
                                         )
@@ -147,13 +153,13 @@ class GatewaySceneAnalysisProvider(private val prefs: GatewayPreferences) : Scen
                                                     when (it.code) {
                                                         401,
                                                         403 ->
-                                                            "Muse access is unavailable. Local alerts continue."
+                                                            "Cloud AI access is unavailable. Local alerts continue."
                                                         429 ->
-                                                            "Muse rate limit reached. Try again shortly."
+                                                            "Cloud AI rate limit reached. Try again shortly."
                                                         504 ->
-                                                            "Muse timed out. Local alerts continue."
+                                                            "Cloud AI timed out. Local alerts continue."
                                                         else ->
-                                                            "Muse is unavailable. Local alerts continue."
+                                                            "Cloud AI is unavailable. Local alerts continue."
                                                     }
                                                 )
                                             val reader = checkNotNull(it.body).charStream()
@@ -164,7 +170,7 @@ class GatewaySceneAnalysisProvider(private val prefs: GatewayPreferences) : Scen
                                                 if (n < 0) break
                                                 text.append(buffer, 0, n)
                                                 check(text.length <= 32000) {
-                                                    "Muse response is too large"
+                                                    "Cloud AI response is too large"
                                                 }
                                             }
                                             text.toString()
@@ -188,7 +194,7 @@ object GatewayResponseParser {
     fun parse(raw: String): SceneResponse {
         require(raw.length <= 32000)
         val root = JSONObject(raw)
-        require(root.getString("model") == "muse-spark-1.3")
+        require(root.getString("model") == "muse-spark-1.3" || root.getString("model").startsWith("gemini-"))
         if (root.has("text")) {
             val answer = MuseReplyParser.text(root.getString("text"))
             val reported = root.optJSONObject("usage")

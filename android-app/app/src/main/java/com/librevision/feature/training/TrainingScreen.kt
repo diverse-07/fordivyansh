@@ -25,6 +25,8 @@ fun TrainingScreen(model: LibreVisionViewModel, state: UiState) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         ScreenHeader("Audio cues", model::back, model::voice)
+        if (state.audioTrainingReady)
+            InstrumentKey("Yes, I am ready", model::finishAudioTraining, Modifier.fillMaxWidth(), LVIcons.Check)
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),

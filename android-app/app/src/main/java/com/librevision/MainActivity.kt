@@ -1,9 +1,12 @@
 package com.librevision
 
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
+import android.net.Uri
 import android.os.*
 import android.view.KeyEvent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -24,6 +27,14 @@ import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.*
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.librevision.domain.alerts.SpeechSetupGate
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import com.librevision.core.design.*
 import com.librevision.feature.footpath.FootpathScreen
 import com.librevision.feature.home.*
@@ -35,9 +46,18 @@ import com.librevision.feature.welcome.*
 
 class MainActivity : ComponentActivity() {
     private val model: LibreVisionViewModel by viewModels()
+    private var speechSetup = SpeechSetupGate()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        speechSetup = SpeechSetupGate(savedInstanceState?.getBoolean("speech_store_opened") ?: false)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                model.state.map { it.speechEngineUnavailable }.distinctUntilChanged().collect { missing ->
+                    if (speechSetup.shouldOpenStore(missing)) openSpeechEngineStore()
+                }
+            }
+        }
         enableEdgeToEdge()
         volumeControlStream = AudioManager.STREAM_MUSIC
         if (Build.VERSION.SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
@@ -53,95 +73,83 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun openSpeechEngineStore() {
+        Toast.makeText(this,
+            "Install or update Speech Recognition & Synthesis from Google, then return to Netra Saathi.",
+            Toast.LENGTH_LONG).show()
+        val opened = runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=com.google.android.tts"))
+                .setPackage("com.android.vending"))
+        }.isSuccess
+        if (!opened) runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.tts")))
+        }.onFailure {
+            Toast.makeText(this, "Open Google Play and search for Speech Recognition & Synthesis from Google.",
+                Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("speech_store_opened", speechSetup.storeOpened)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onStart() {
         super.onStart()
         model.foreground()
     }
 
     override fun onStop() {
+        cancelGesture()
         model.background()
         super.onStop()
     }
 
     private val keyHandler = Handler(Looper.getMainLooper())
-    private var isVolumeUpLongPress = false
-    private var clickCount = 0
-    private var lastClickTime = 0L
-
-    private val longPressRunnable = Runnable {
-        isVolumeUpLongPress = true
-        vibrate(60)
-        model.voice()
+    private val volumeGesture = com.librevision.domain.commands.VolumeUpGesture()
+    private val gestureTick = Runnable {
+        applyGesture(volumeGesture.tick(SystemClock.elapsedRealtime()))
+        scheduleGesture()
     }
-
-    private val singleClickVolumeRunnable = Runnable {
-        if (clickCount == 1) {
-            clickCount = 0
-            val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
-            audioManager?.adjustStreamVolume(
-                AudioManager.STREAM_MUSIC,
-                AudioManager.ADJUST_RAISE,
-                AudioManager.FLAG_SHOW_UI
-            )
+    private fun cancelGesture() { keyHandler.removeCallbacks(gestureTick); volumeGesture.cancel() }
+    private fun applyGesture(actions: List<com.librevision.domain.commands.VolumeUpGesture.Action>) {
+        for (action in actions) when (action) {
+            com.librevision.domain.commands.VolumeUpGesture.Action.VOICE -> { vibrate(60); model.voice() }
+            com.librevision.domain.commands.VolumeUpGesture.Action.ALARM -> { vibrate(300); model.triggerEmergencyLoudspeakerAlarm() }
+            com.librevision.domain.commands.VolumeUpGesture.Action.VOLUME_UP ->
+                (getSystemService(Context.AUDIO_SERVICE) as? AudioManager)?.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
         }
     }
-
-    /**
-     * Physical Hardware Key Interceptor:
-     * - Long Press Volume Up (>2.0s): Starts Voice Assistant hands-free with tactile vibration.
-     * - Triple Click Volume Up (3x within 1.2s): Triggers Built-in Loudspeaker Emergency Siren.
-     * - If Alarm is active: Single click immediately silences it.
-     * - Single Click: Normal Volume Up increment (after 450ms debounce).
-     */
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (event.keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            val now = SystemClock.elapsedRealtime()
-
-            // If emergency alarm is active, tapping Volume Up immediately silences it
-            if (model.emergencyAlarm.isAlarmActive.get()) {
-                if (event.action == KeyEvent.ACTION_UP) {
-                    model.triggerEmergencyLoudspeakerAlarm()
-                }
-                return true
-            }
-
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                if (event.repeatCount == 0) {
-                    isVolumeUpLongPress = false
-                    keyHandler.removeCallbacks(singleClickVolumeRunnable)
-                    keyHandler.postDelayed(longPressRunnable, 2000)
-                }
-                return true
-            } else if (event.action == KeyEvent.ACTION_UP) {
-                keyHandler.removeCallbacks(longPressRunnable)
-                if (isVolumeUpLongPress) {
-                    isVolumeUpLongPress = false
-                    return true
-                }
-
-                // Rapid triple click detection within 500ms intervals
-                if (now - lastClickTime < 500) {
-                    clickCount++
-                } else {
-                    clickCount = 1
-                }
-                lastClickTime = now
-
-                if (clickCount >= 3) {
-                    keyHandler.removeCallbacks(singleClickVolumeRunnable)
-                    clickCount = 0
-                    vibrate(300)
-                    model.triggerEmergencyLoudspeakerAlarm()
-                    return true
-                } else {
-                    // Schedule normal single volume step up if no subsequent clicks follow
-                    keyHandler.removeCallbacks(singleClickVolumeRunnable)
-                    keyHandler.postDelayed(singleClickVolumeRunnable, 450)
-                    return true
-                }
-            }
+    private fun scheduleGesture() {
+        keyHandler.removeCallbacks(gestureTick)
+        volumeGesture.nextDeadline()?.let {
+            keyHandler.postDelayed(gestureTick, (it - SystemClock.elapsedRealtime()).coerceAtLeast(1))
         }
-        return super.dispatchKeyEvent(event)
+    }
+    private fun handleVolumeEvent(event: KeyEvent): Boolean {
+        if (model.emergencyAlarm.isAlarmActive.get()) {
+            cancelGesture()
+            if (event.action == KeyEvent.ACTION_UP && !event.isCanceled) model.triggerEmergencyLoudspeakerAlarm()
+            return true
+        }
+        val now = SystemClock.elapsedRealtime()
+        when (event.action) {
+            KeyEvent.ACTION_DOWN -> if (event.repeatCount == 0) applyGesture(volumeGesture.down(now))
+            KeyEvent.ACTION_UP -> applyGesture(volumeGesture.up(now, event.isCanceled))
+        }
+        scheduleGesture()
+        return true
+    }
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean =
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) handleVolumeEvent(event) else super.onKeyDown(keyCode, event)
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean =
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) handleVolumeEvent(event) else super.onKeyUp(keyCode, event)
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) cancelGesture()
     }
 
     private fun vibrate(durationMs: Long) {

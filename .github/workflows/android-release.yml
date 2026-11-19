@@ -15,6 +15,10 @@ concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+defaults:
+  run:
+    working-directory: android-app
+
 jobs:
   checks:
     name: Tests and debug build
@@ -37,28 +41,32 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: worker/package-lock.json
+          cache-dependency-path: android-app/worker/package-lock.json
       - name: Install Android SDK components
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0"'
       - name: Validate release configuration and helpers
         run: |
-          python3 scripts/release_apk.py gateway
           python3 -m unittest discover -s scripts -p 'test_release_apk.py'
       - name: Android tests, lint and debug APK
         run: ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon testDebugUnitTest lintDebug assembleDebug
       - name: Worker tests
-        working-directory: worker
+        working-directory: android-app/worker
         run: |
           npm ci
           npm test
+      - name: Upload debug APK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: NetraSaathi-debug
+          path: android-app/app/build/outputs/apk/debug/app-debug.apk
       - name: Upload check reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: check-reports
           path: |
-            app/build/test-results/**/*.xml
-            app/build/reports/lint-results-debug.*
+            android-app/app/build/test-results/**/*.xml
+            android-app/app/build/reports/lint-results-debug.*
           if-no-files-found: ignore
           retention-days: 14
           overwrite: true
@@ -68,7 +76,7 @@ jobs:
     needs: checks
     if: >-
       github.event_name != 'pull_request' &&
-      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+      startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     permissions:
@@ -89,11 +97,11 @@ jobs:
       - name: Release version
         id: version
         run: python3 scripts/release_apk.py metadata --ref "$GITHUB_REF" --run-number "$GITHUB_RUN_NUMBER" --sha "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
-      - name: Check the public Muse gateway
+      - name: Check the public cloud gateway
         run: |
           gateway_url=$(python3 scripts/release_apk.py gateway)
           curl --fail --silent --show-error --retry 2 --max-time 20 "$gateway_url/health" > "$RUNNER_TEMP/gateway-health.json"
-          python3 -c 'import json, sys; data=json.load(open(sys.argv[1])); assert data.get("configured") is True, "The public Meta gateway is not configured"' "$RUNNER_TEMP/gateway-health.json"
+          python3 -c 'import json, sys; data=json.load(open(sys.argv[1])); assert data.get("protocolVersion") == 1 and data.get("configured") is True, "The public cloud gateway is not configured"' "$RUNNER_TEMP/gateway-health.json"
       - name: Restore release signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
@@ -107,7 +115,7 @@ jobs:
           for name in ('KEYSTORE_BASE64', 'STORE_PASSWORD', 'KEY_ALIAS', 'KEY_PASSWORD'):
               if not os.environ.get(name):
                   raise SystemExit(f'Missing release signing secret: {name}')
-          directory = Path(os.environ['RUNNER_TEMP']) / 'librevision-signing'
+          directory = Path(os.environ['RUNNER_TEMP']) / 'netrasaathi-signing'
           directory.mkdir(mode=0o700)
           key = directory / 'release.p12'
           key.write_bytes(base64.b64decode(os.environ['KEYSTORE_BASE64'], validate=True))
@@ -115,15 +123,15 @@ jobs:
           PY
       - name: Build signed release APK
         env:
-          LIBREVISION_KEYSTORE_FILE: ${{ runner.temp }}/librevision-signing/release.p12
-          LIBREVISION_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
-          LIBREVISION_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
-          LIBREVISION_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+          NETRASAATHI_KEYSTORE_FILE: ${{ runner.temp }}/netrasaathi-signing/release.p12
+          NETRASAATHI_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          NETRASAATHI_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          NETRASAATHI_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
           VERSION_NAME: ${{ steps.version.outputs.version_name }}
         run: >-
           ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon
-          -PlibrevisionVersionCode="$VERSION_CODE" -PlibrevisionVersionName="$VERSION_NAME"
+          -PnetraSaathiVersionCode="$VERSION_CODE" -PnetraSaathiVersionName="$VERSION_NAME"
           assembleRelease lintRelease
       - name: Verify and package the APK
         run: >-
@@ -133,12 +141,12 @@ jobs:
           --ref "$GITHUB_REF" --run-number "$GITHUB_RUN_NUMBER" --sha "$GITHUB_SHA"
       - name: Remove the signing key
         if: always()
-        run: rm -rf "$RUNNER_TEMP/librevision-signing"
+        run: rm -rf "$RUNNER_TEMP/netrasaathi-signing"
       - name: Upload release build artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: signed-release-${{ github.run_number }}
-          path: release-output/
+          path: android-app/release-output/
           if-no-files-found: error
           retention-days: 14
           overwrite: true
@@ -158,13 +166,13 @@ jobs:
             fi
           fi
           if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release-output/LibreVision.apk release-output/LibreVision-notices.zip release-output/build-info.json release-output/SHA256SUMS --clobber
+            gh release upload "$RELEASE_TAG" release-output/NetraSaathi.apk release-output/NetraSaathi-notices.zip release-output/build-info.json release-output/SHA256SUMS --clobber
           else
-            gh release create "$RELEASE_TAG" release-output/LibreVision.apk release-output/LibreVision-notices.zip release-output/build-info.json release-output/SHA256SUMS --verify-tag --draft --title "$RELEASE_TITLE" --notes-file release-output/release-notes.txt
+            gh release create "$RELEASE_TAG" release-output/NetraSaathi.apk release-output/NetraSaathi-notices.zip release-output/build-info.json release-output/SHA256SUMS --verify-tag --draft --title "$RELEASE_TITLE" --notes-file release-output/release-notes.txt
           fi
           if [ "$PRERELEASE" = true ]; then
             gh release edit "$RELEASE_TAG" --draft=false --prerelease --latest=false --title "$RELEASE_TITLE" --notes-file release-output/release-notes.txt
           else
             gh release edit "$RELEASE_TAG" --draft=false --prerelease=false --latest --title "$RELEASE_TITLE" --notes-file release-output/release-notes.txt
           fi
-          printf '### Download LibreVision\nhttps://github.com/%s/releases/tag/%s\n' "$GH_REPO" "$RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"
+          printf '### Download NetraSaathi\nhttps://github.com/%s/releases/tag/%s\n' "$GH_REPO" "$RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"

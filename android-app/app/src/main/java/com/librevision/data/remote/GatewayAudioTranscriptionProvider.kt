@@ -64,7 +64,7 @@ class GatewayAudioTranscriptionProvider(
                                         continuation.resume(
                                             Result.failure(
                                                 IOException(
-                                                    "Online speech is unavailable. Please repeat or type the place name."
+                                                    "Could not reach online speech recognition. Check your connection and try again."
                                                 )
                                             )
                                         )
@@ -75,14 +75,22 @@ class GatewayAudioTranscriptionProvider(
                                         response.use {
                                             check(it.isSuccessful) {
                                                 when (it.code) {
+                                                    401, 403 ->
+                                                        "The configured gateway denied access to online speech."
+                                                    404, 415 ->
+                                                        "The configured gateway does not support this app’s online speech requests."
+                                                    400, 413 ->
+                                                        "The recording could not be processed. Try one short sentence."
                                                     429 ->
-                                                        "Online speech is busy. Please repeat shortly."
+                                                        "Online speech has reached a request limit. Try again later."
                                                     422 ->
                                                         "Speech was not understood. Please repeat."
-                                                    503 ->
-                                                        "Netra Saathi Voice Transcribe is unavailable. Local commands still work."
+                                                    502, 503 ->
+                                                        "Online speech recognition is temporarily unavailable. Try again."
+                                                    504 ->
+                                                        "Online speech recognition timed out. Try a shorter request."
                                                     else ->
-                                                        "Online speech failed. Please repeat or type the place name."
+                                                        "Online speech recognition failed. Try again."
                                                 }
                                             }
                                             val reader = checkNotNull(it.body).charStream()

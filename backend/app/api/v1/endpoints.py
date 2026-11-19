@@ -1,73 +1,54 @@
 import io
 from fastapi import APIRouter, File, UploadFile, HTTPException, Form
-from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
-from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from typing import Annotated, Literal
+from PIL import Image, UnidentifiedImageError
 from app.services.gemini_service import gemini_service
 
-router = APIRouter()
-
+router=APIRouter()
+Question=Annotated[str,StringConstraints(strip_whitespace=True,min_length=1,max_length=500)]
 class ChatRequest(BaseModel):
-    question: str
-
+    model_config=ConfigDict(extra="forbid")
+    question: Question
 class SOSRequest(BaseModel):
-    user_id: str
-    latitude: float
-    longitude: float
-    battery_level: Optional[float] = None
-    trigger_reason: str = "manual_triple_tap" # or "fall_detected"
+    model_config=ConfigDict(extra="forbid",allow_inf_nan=False)
+    user_id: str = Field(min_length=1,max_length=100)
+    latitude: float = Field(ge=-90,le=90)
+    longitude: float = Field(ge=-180,le=180)
+    battery_level: float | None = Field(default=None,ge=0,le=100)
+    trigger_reason: Literal["manual_triple_tap","fall_detected"] = "manual_triple_tap"
+
+def decode_image(raw: bytes):
+    if not raw or len(raw)>512000:raise HTTPException(413,"IMAGE_SIZE_LIMIT")
+    try:
+        image=Image.open(io.BytesIO(raw))
+        if image.width>4096 or image.height>4096 or image.width*image.height>4194304:
+            raise HTTPException(413,"IMAGE_PIXEL_LIMIT")
+        image.load()
+        return image.convert("RGB")
+    except (UnidentifiedImageError,OSError,ValueError,Image.DecompressionBombError):
+        raise HTTPException(422,"INVALID_IMAGE") from None
+
+async def upload_image(image):
+    if not (image.content_type or "").startswith("image/"):raise HTTPException(415,"IMAGE_CONTENT_TYPE")
+    return decode_image(await image.read(512001))
 
 @router.post("/scene/analyze")
-async def analyze_scene(image: UploadFile = File(...)):
-    """
-    Receives camera frame, runs Gemini 2.0 Flash scene analysis,
-    and returns audio-first pedestrian navigation instructions.
-    """
-    if not image.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image.")
-    
-    try:
-        image_bytes = await image.read()
-        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        result = gemini_service.analyze_scene(pil_image)
-        return {"status": "success", "data": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def analyze_scene(image: UploadFile=File(...)):
+    result=await gemini_service.analyze_scene(await upload_image(image))
+    return {"status":"success","data":result["data"],"model":result["model"],"usage":result["usage"]}
 
 @router.post("/ocr/smart-read")
-async def smart_ocr(image: UploadFile = File(...), query_type: str = Form("general")):
-    """
-    Reads signs, menus, documents, and medicine bottles with deep context.
-    """
-    if not image.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image.")
-        
-    try:
-        image_bytes = await image.read()
-        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        result = gemini_service.smart_ocr(pil_image, query_type=query_type)
-        return {"status": "success", "data": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def smart_ocr(image: UploadFile=File(...),query_type: str=Form("general",max_length=80)):
+    result=await gemini_service.smart_ocr(await upload_image(image),query_type)
+    return {"status":"success","data":result["data"],"model":result["model"],"usage":result["usage"]}
 
 @router.post("/chat/message")
 async def chat_message(request: ChatRequest):
-    """
-    Conversational voice queries regarding environment or navigation.
-    """
-    answer = gemini_service.chat(request.question)
-    return {"status": "success", "response": answer}
+    result=await gemini_service.chat(request.question)
+    return {"status":"success","response":result["text"],"model":result["model"],"usage":result["usage"]}
 
 @router.post("/emergency/sos")
 async def trigger_sos(sos: SOSRequest):
-    """
-    Registers an SOS or fall detection event, logs coordinates for the caretaker dashboard.
-    """
-    # In production, dispatch push notifications to linked caretakers via FCM
-    return {
-        "status": "sos_acknowledged",
-        "user_id": sos.user_id,
-        "location": {"lat": sos.latitude, "lng": sos.longitude},
-        "reason": sos.trigger_reason,
-        "message": "Emergency broadcast triggered to all registered caretakers."
-    }
+    # No delivery provider or guardian pairing exists. Never acknowledge a broadcast.
+    raise HTTPException(503,"GUARDIAN_NOTIFICATIONS_NOT_CONFIGURED")

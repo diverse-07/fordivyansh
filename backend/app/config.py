@@ -1,24 +1,22 @@
+import json
 import os
-from typing import List
 from dotenv import load_dotenv
-
-# Load environment variables from .env file
 load_dotenv()
 
 class Settings:
-    PROJECT_NAME: str = "Netra Saathi Cloud AI"
-    VERSION: str = "1.0.0"
-    API_V1_PREFIX: str = "/api/v1"
-    
-    # Gemini API Configuration
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    _configured_model: str = os.getenv("DEFAULT_GEMINI_MODEL", "gemini-3-flash-preview")
-    # Automatically remap deprecated model names to active preview model
-    DEFAULT_GEMINI_MODEL: str = "gemini-3-flash-preview" if "2.0-flash" in _configured_model or "1.5-flash" in _configured_model else _configured_model
-    FALLBACK_GEMINI_MODEL: str = os.getenv("FALLBACK_GEMINI_MODEL", "gemini-2.5-flash")
-    PRO_GEMINI_MODEL: str = os.getenv("PRO_GEMINI_MODEL", "gemini-2.5-pro")
-    
-    # CORS
-    CORS_ORIGINS: List[str] = ["*"]
-
+    PROJECT_NAME = "Netra Saathi Cloud AI"
+    VERSION = "1.1.0"
+    API_V1_PREFIX = "/api/v1"
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+    DEFAULT_GEMINI_MODEL = os.getenv("DEFAULT_GEMINI_MODEL", "")
+    FALLBACK_GEMINI_MODEL = os.getenv("FALLBACK_GEMINI_MODEL", "")
+    API_ACCESS_TOKEN = os.getenv("API_ACCESS_TOKEN", "")
+    CORS_ORIGINS = json.loads(os.getenv("CORS_ORIGINS", '["http://localhost:3000"]'))
+    MAX_BODY_BYTES = 1200000
+    PROVIDER_TIMEOUT_SECONDS = 15
+    DAILY_AI_ATTEMPTS = int(os.getenv("DAILY_AI_ATTEMPTS", "100"))
+    QUOTA_DATABASE = os.getenv("QUOTA_DATABASE", ".runtime/quota.sqlite3")
+    @property
+    def gemini_configured(self):
+        return bool(self.GEMINI_API_KEY and self.GEMINI_API_KEY != "your_gemini_api_key_here" and self.DEFAULT_GEMINI_MODEL)
 settings = Settings()

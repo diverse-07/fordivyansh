@@ -443,6 +443,16 @@ fun MuseGatewaySettings(model: LibreVisionViewModel) {
                     },
             )
         }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Allow surroundings descriptions", fontSize = 20.sp, modifier = Modifier.weight(1f))
+            Switch(
+                nav.surroundingsConsent,
+                model::setSurroundingsConsent,
+                modifier = Modifier.semantics {
+                    contentDescription = "Allow sending selected pictures from surroundings recordings to Google Gemini"
+                },
+            )
+        }
         if (com.librevision.BuildConfig.DEBUG) {
             Text("Developer connection override", fontSize = 18.sp)
             OutlinedTextField(

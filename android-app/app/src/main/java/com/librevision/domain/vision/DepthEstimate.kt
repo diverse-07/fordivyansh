@@ -54,7 +54,13 @@ data class DepthFrame(
 }
 
 object ObstacleSpeech {
-    fun message(label: String, distance: DepthDistance?, stepLength: Float, now: Long): String {
+    fun message(label: String, distance: DepthDistance?, stepLength: Float, now: Long, bangla: Boolean = false): String {
+        if (bangla) {
+            val objectName = mapOf("person" to "মানুষ", "car" to "গাড়ি", "bicycle" to "সাইকেল",
+                "motorcycle" to "মোটরসাইকেল", "bus" to "বাস", "truck" to "ট্রাক",
+                "dog" to "কুকুর", "chair" to "চেয়ার").getOrDefault(label, "বাধা")
+            return "থামুন। সামনে " + objectName + " শনাক্ত হয়েছে। দূরত্ব নিশ্চিত নয়।"
+        }
         // The bundled metric-depth model is an unvalidated outdoor range estimator.
         // Vehicle warnings never wait for it or present its output as a stopping distance.
         if (TrafficObjects.contains(label)) return "Stop, $label ahead."

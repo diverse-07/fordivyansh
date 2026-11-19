@@ -1,21 +1,9 @@
-# 🌐 Netra Saathi Guardian — Caretaker Live Dashboard
+# Netra Saathi Guardian
 
-Next.js 14 web application for families and caretakers to monitor visually impaired pedestrians in real-time.
+This interface has no connected telemetry, guardian identity, notification delivery or
+remote-command service. It displays unknown/unavailable states. Alert preview is local
+only and does not send or acknowledge a real SOS.
 
----
-
-## ⚡ Key Features
-- **Live Footpath Map Tracking**: Real-time GPS location lock with heading and walking gait metrics.
-- **3-Zone Hazard Telemetry Feed**: Streams detected hazards in real-time across Head-Height (tree branches, low signs), Torso (bicycles, vehicles), and Ground Level (potholes, drops).
-- **Emergency SOS & Fall Alerts**: Instant sirens when a user triggers SOS or when a sudden fall is detected.
-- **1-Click Free Deployment**: Configured for instant deployment on Vercel or Render.
-
----
-
-## 🚀 Running Locally
-
-```bash
-npm install
-npm run dev
-```
-Open `http://localhost:3000` in your browser.
+Use Node 22.13+. Run npm ci, npm run lint, npm run typecheck, npm run build, then npm run dev.
+No private data should be exposed without an implemented authorization and pairing service.
+No new service was added during the bug-fix pass.

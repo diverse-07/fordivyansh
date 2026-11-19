@@ -94,7 +94,7 @@ class VoskUtteranceRecognizer(
             return result.copy(
                 text =
                     if (AppSpeechPhrases.hasWake(result.text)) result.text
-                    else text.substringBefore("[unk]").trim(),
+                    else text,
                 wakeDetected = true,
             )
         }
@@ -130,8 +130,7 @@ class VoskUtteranceRecognizer(
         val freeText = result.optString("text").trim()
         if (wake && !AppSpeechPhrases.hasWake(freeText))
             return DecodedSpeech(
-                text.substringBefore("[unk]").trim().takeIf(AppSpeechPhrases::hasWake)
-                    ?: "hey vision",
+                text,
                 confidence.take(2).average().toFloat(),
             )
         val fullWords = result.optJSONArray("result")

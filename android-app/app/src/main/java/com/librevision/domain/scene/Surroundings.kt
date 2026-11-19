@@ -41,6 +41,7 @@ data class SurroundingsContext(
  * One representative timestamp in each equal-duration chunk; no rotation or coverage assumptions.
  */
 object VideoFramePlan {
+    const val AUTO_CAPTURE_MS = 5000L
     const val MAX_DURATION_MS = 30000L
 
     fun offsets(durationMs: Long, count: Int = 12): List<Long> {

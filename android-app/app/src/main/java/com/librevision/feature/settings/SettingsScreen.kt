@@ -99,13 +99,13 @@ fun SettingsScreen(model: LibreVisionViewModel, state: UiState) {
                     modifier =
                         Modifier.semantics {
                             contentDescription =
-                                "Keep microphone on for local Hey Saathi wake detection"
+                                "Keep microphone on for local Hey Vision wake detection"
                         },
                 )
             }
             Text(
                 if (state.handsFree)
-                    "Say Hey Saathi to activate commands. Listening stays active for 18 seconds after each request finishes, then returns to local wake detection."
+                    "Say Hey Vision to activate commands. Listening stays active for 18 seconds after each request finishes, then returns to local wake detection."
                 else "Microphone stays off until you tap a voice button.",
                 fontSize = 17.sp,
                 color = colors.secondary,
@@ -121,12 +121,12 @@ fun SettingsScreen(model: LibreVisionViewModel, state: UiState) {
                     modifier =
                         Modifier.semantics {
                             contentDescription =
-                                "Send unrecognized speech utterances to Meta for transcription"
+                                "Send unrecognized speech utterances to Google Gemini for transcription"
                         },
                 )
             }
             Text(
-                "Only after wake or a voice-button tap: sends an uncertain utterance or place name to Meta. Idle conversation is never uploaded. The app does not save recordings.",
+                "Only after wake or a voice-button tap: sends an uncertain utterance or place name to Google Gemini. Idle conversation is never uploaded. The app does not save recordings.",
                 fontSize = 17.sp,
                 color = colors.secondary,
             )

@@ -40,3 +40,14 @@ Expected output:
 - **Model Size:** ~3.5MB to 4.0MB
 - **Latency on Modern CPU/NPU:** ~18ms – 32ms
 - **Memory Footprint:** < 25MB RAM
+
+
+## Bug-fix pass
+
+Canonical scripts are in this root ml-training directory; android-app/ml-training contains
+compatibility entry points. Export derives labels from the trained model and emits ONNX
+alongside TFLite with a checksum manifest. Models are not automatically enabled in Android.
+The verifier requires a real image, matching labels.txt, valid tensor contracts and a 35ms
+inference/decode budget. It does not validate outdoor accuracy or full camera-to-speech latency.
+Unit fixtures cover CPU selection, class-aware NMS and trained label ordering. No new training
+run or ground-truth evaluation was performed during this bug-fix pass.

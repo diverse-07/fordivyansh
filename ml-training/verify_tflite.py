@@ -40,7 +40,7 @@ def nms(boxes, scores, iou_threshold=0.45):
         w = np.maximum(0.0, xx2 - xx1)
         h = np.maximum(0.0, yy2 - yy1)
         inter = w * h
-        ovr = inter / (areas[i] + areas[order[1:]] - inter)
+        ovr = inter / np.maximum(areas[i] + areas[order[1:]] - inter, 1e-12)
 
         inds = np.where(ovr <= iou_threshold)[0]
         order = order[inds + 1]
@@ -61,7 +61,9 @@ def decode_yolov8_output(raw_output, conf_threshold=0.45, iou_threshold=0.45, in
     class_ids = []
 
     for row in output:
+        if not np.all(np.isfinite(row)): continue
         cx, cy, w, h = row[:4]
+        if w <= 0 or h <= 0: continue
         class_scores = row[4:]
         best_class = np.argmax(class_scores)
         best_score = class_scores[best_class]
@@ -82,7 +84,11 @@ def decode_yolov8_output(raw_output, conf_threshold=0.45, iou_threshold=0.45, in
     scores = np.array(scores)
     class_ids = np.array(class_ids)
 
-    indices = nms(boxes, scores, iou_threshold)
+    indices = []
+    for class_id in np.unique(class_ids):
+        selected = np.flatnonzero(class_ids == class_id)
+        indices.extend(selected[nms(boxes[selected], scores[selected], iou_threshold)].tolist())
+    indices = sorted(indices, key=lambda i: float(scores[i]), reverse=True)[:20]
     return boxes[indices], scores[indices], class_ids[indices]
 
 def test_tflite_model(model_path: str, image_path: str = None, runs: int = 50):
@@ -110,14 +116,32 @@ def test_tflite_model(model_path: str, image_path: str = None, runs: int = 50):
     print(f"Input  Shape: {input_details[0]['shape']}, Dtype: {input_details[0]['dtype']}")
     print(f"Output Shape: {output_details[0]['shape']}, Dtype: {output_details[0]['dtype']}")
 
+    assert len(input_details) == 1 and len(output_details) == 1, "Expected one input/output"
     input_shape = input_details[0]['shape']
+    assert list(input_shape) == [1, 320, 320, 3], "Unsupported input tensor contract"
+    label_path = Path(model_path).parent / "labels.txt"
+    if not label_path.is_file(): raise ValueError("labels.txt must accompany the trained model")
+    labels = [x.strip() for x in label_path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    assert labels, "Empty label mapping"
+    assert list(output_details[0]["shape"]) in ([1, 4+len(labels), 2100], [1, 2100, 4+len(labels)]), "Unsupported output tensor contract"
+    if not image_path or not Path(image_path).is_file():
+        raise ValueError("A real evaluation image is required; random inputs cannot verify a detector")
+    if runs < 1: raise ValueError("runs must be positive")
     input_dtype = input_details[0]['dtype']
+    assert input_dtype in (np.float32, np.uint8, np.int8), "Unsupported input dtype"
+    assert output_details[0]["dtype"] in (np.float32, np.uint8, np.int8), "Unsupported output dtype"
+    if output_details[0]["dtype"] in (np.uint8, np.int8) and output_details[0]["quantization"][0] <= 0:
+        raise ValueError("Invalid output quantization scale")
     input_dim = input_shape[1]
 
     if image_path and Path(image_path).exists():
         from PIL import Image
         img = Image.open(image_path).convert('RGB')
-        img = img.resize((input_dim, input_dim))
+        scale = min(input_dim / img.width, input_dim / img.height)
+        resized = img.resize((round(img.width * scale), round(img.height * scale)))
+        padded = Image.new('RGB', (input_dim, input_dim), (114, 114, 114))
+        padded.paste(resized, ((input_dim-resized.width)//2, (input_dim-resized.height)//2))
+        img = padded
         input_data = np.array(img, dtype=np.float32) / 255.0
         input_data = np.expand_dims(input_data, axis=0)
     else:
@@ -127,8 +151,8 @@ def test_tflite_model(model_path: str, image_path: str = None, runs: int = 50):
     # De-quantize logic if model requires integer input
     if input_dtype in (np.uint8, np.int8):
         scale, zp = input_details[0]['quantization']
-        scale = scale if scale > 0 else 1.0 / 255.0
-        input_data = (input_data / scale + zp).astype(input_dtype)
+        if scale <= 0: raise ValueError("Invalid input quantization scale")
+        input_data = np.clip(np.rint(input_data / scale + zp), np.iinfo(input_dtype).min, np.iinfo(input_dtype).max).astype(input_dtype)
 
     # Warmup
     for _ in range(3):
@@ -162,15 +186,14 @@ def test_tflite_model(model_path: str, image_path: str = None, runs: int = 50):
     print(f"Total Pipeline:    {avg_latency + decode_time_ms:.2f} ms")
     print(f"Detections Found:  {len(boxes)}")
 
-    labels = ["pothole", "crack", "manhole"]
     for i in range(len(boxes)):
         lbl = labels[classes[i]] if classes[i] < len(labels) else f"class_{classes[i]}"
         print(f"  [{i+1}] {lbl.upper()}: {scores[i]:.2%} at {np.round(boxes[i], 3)}")
 
-    if (avg_latency + decode_time_ms) <= 40.0:
-        print("\n✅ PASS: Inference + NMS is well under the 40ms safety budget (25+ FPS).")
+    if (avg_latency + decode_time_ms) <= 35.0:
+        print("\n✅ PASS: Tensor and inference/decode benchmark under 35ms. Detection accuracy and real camera latency are not validated.")
     else:
-        print("\n⚠️ Note: Pipeline slightly exceeds 40ms. Target NNAPI hardware delegate on mobile.")
+        raise RuntimeError("Inference/decode exceeds the 35ms benchmark budget")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Verify VisionAssist YOLOv8 TFLite Model")

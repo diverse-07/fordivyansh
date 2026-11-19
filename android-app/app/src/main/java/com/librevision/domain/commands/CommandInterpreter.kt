@@ -113,14 +113,21 @@ class CommandInterpreter(private val aliases: Map<Command, Set<String>> = defaul
                         "scan all around",
                         "describe surroundings",
                         "describe scene",
+                        "tell me what i'm looking at",
+                        "tell me what i am looking at",
+                        "can you tell me what i'm looking at",
+                        "can you tell me what i am looking at",
+                        "what am i looking at",
+                        "describe what's in front of me",
+                        "tell me what's in front of me",
                         "চারপাশ বর্ণনা করো",
                         "চারপাশ দেখাও",
                     ),
                 Command.LEARN_AUDIO_CUES to
-                    setOf("learn audio cues", "audio training", "শব্দ শেখাও"),
+                    setOf("learn audio cues", "audio training", "teach me the audio cues", "শব্দ শেখাও"),
                 Command.REPEAT to setOf("repeat", "say again", "আবার বলো"),
                 Command.STOP to setOf("stop", "cancel", "থামো", "বন্ধ করো"),
-                Command.HELP to setOf("help", "how to use", "সাহায্য"),
+                Command.HELP to setOf("help", "how to use", "what can i say", "what can i do here", "voice commands", "সাহায্য"),
                 Command.EMERGENCY_ALARM to setOf("emergency", "sos", "siren", "danger", "call help", "start siren"),
             )
     }

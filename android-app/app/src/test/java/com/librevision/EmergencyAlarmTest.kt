@@ -1,87 +1,37 @@
 package com.librevision
-
-import com.librevision.domain.alerts.FeedbackCue
+import com.librevision.domain.commands.VolumeUpGesture
+import com.librevision.domain.commands.VolumeUpGesture.Action
+import com.librevision.core.safety.AlarmCycle
 import org.junit.Assert.*
 import org.junit.Test
-import java.util.concurrent.atomic.AtomicBoolean
-
 class EmergencyAlarmTest {
-
-    @Test
-    fun emergencyAndVoiceTriggerCuesAreBriefAndValid() {
-        val emergency = FeedbackCue.EMERGENCY
-        assertEquals("SOS Alarm", emergency.label)
-        assertTrue(emergency.frequencies.isNotEmpty())
-        assertTrue(emergency.haptics.sum() < 200)
-        assertEquals(255, emergency.amplitude)
-
-        val voice = FeedbackCue.VOICE_TRIGGER
-        assertEquals("Voice Activated", voice.label)
-        assertTrue(voice.frequencies.isNotEmpty())
-        assertTrue(voice.haptics.sum() < 200)
+    private fun click(g: VolumeUpGesture, at: Long): List<Action> { g.down(at); return g.up(at+20) }
+    @Test fun threeClicksAcrossTheFullDocumentedWindowTriggerAlarm() {
+        val g=VolumeUpGesture()
+        assertTrue(click(g,1000).isEmpty());assertTrue(click(g,1590).isEmpty())
+        assertEquals(listOf(Action.ALARM),click(g,2180))
+        assertTrue(g.tick(4000).isEmpty())
     }
-
-    @Test
-    fun tripleClickWindowLogicRequiresThreeClicksWithinThreshold() {
-        val clickThresholdMs = 500L
-        var clickCount = 0
-        var lastClickTime = 0L
-        var alarmTriggered = false
-
-        fun handleClick(now: Long) {
-            if (now - lastClickTime < clickThresholdMs) {
-                clickCount++
-            } else {
-                clickCount = 1
-            }
-            lastClickTime = now
-
-            if (clickCount >= 3) {
-                clickCount = 0
-                alarmTriggered = true
-            }
-        }
-
-        // 1st click at t=1000
-        handleClick(1000L)
-        assertEquals(1, clickCount)
-        assertFalse(alarmTriggered)
-
-        // 2nd click at t=1300 (<500ms later)
-        handleClick(1300L)
-        assertEquals(2, clickCount)
-        assertFalse(alarmTriggered)
-
-        // 3rd click at t=1600 (<500ms later) -> Fires!
-        handleClick(1600L)
-        assertEquals(0, clickCount)
-        assertTrue(alarmTriggered)
-
-        // Delayed click at t=3000 (>500ms later) -> Resets to 1 click, does not fire
-        alarmTriggered = false
-        handleClick(3000L)
-        assertEquals(1, clickCount)
-        assertFalse(alarmTriggered)
+    @Test fun singleAndDoubleClicksRetainNormalVolume() {
+        val g=VolumeUpGesture();click(g,1000)
+        assertEquals(listOf(Action.VOLUME_UP),g.tick(2221))
+        click(g,3000);click(g,3100)
+        assertEquals(listOf(Action.VOLUME_UP,Action.VOLUME_UP),g.tick(4221))
     }
-
-    @Test
-    fun alarmToggleStateFlipsCorrectly() {
-        val isAlarmActive = AtomicBoolean(false)
-
-        fun toggle(): Boolean {
-            return if (isAlarmActive.get()) {
-                isAlarmActive.set(false)
-                false
-            } else {
-                isAlarmActive.set(true)
-                true
-            }
-        }
-
-        assertFalse(isAlarmActive.get())
-        assertTrue(toggle()) // Activated
-        assertTrue(isAlarmActive.get())
-        assertFalse(toggle()) // Silenced
-        assertFalse(isAlarmActive.get())
+    @Test fun holdRunsOnceAndNeverCountsAsClick() {
+        val g=VolumeUpGesture();g.down(1000)
+        assertTrue(g.tick(2999).isEmpty());assertEquals(listOf(Action.VOICE),g.tick(3000))
+        assertTrue(g.tick(4000).isEmpty());assertTrue(g.up(4500).isEmpty())
+        assertTrue(g.tick(10000).isEmpty())
+    }
+    @Test fun cancellationClearsBothGestureTimers() {
+        val g=VolumeUpGesture();click(g,1000);g.down(1100);g.cancel()
+        assertTrue(g.tick(5000).isEmpty());assertNull(g.nextDeadline())
+        g.down(6000);g.up(6100,true);assertTrue(g.tick(9000).isEmpty())
+    }
+    @Test fun finiteSirenCompletesOnFramesOrDeadlineEvenWhileTrackIsPlaying() {
+        assertFalse(AlarmCycle.complete(100,110250,3000))
+        assertTrue(AlarmCycle.complete(110250,110250,2500))
+        assertTrue(AlarmCycle.complete(100,110250,3500))
     }
 }

@@ -140,9 +140,9 @@ class WelcomeTest {
     @Test
     fun tourContainsPracticalControlsAndCueExamples() {
         val text = WelcomeFlow.lessons.joinToString { it.text }
-        listOf("Hey Saathi", "18 seconds", "Start Scanning", "Finish recording", "Settings")
+        listOf("Hey Vision", "18 seconds", "Start Scanning", "stops automatically", "Settings")
             .forEach { assertTrue(it, text.contains(it)) }
         assertEquals(2, WelcomeFlow.lessons.count { it.cue != null })
-        assertFalse(WelcomeFlow.lessons.last().text.contains("Hey Saathi"))
+        assertFalse(WelcomeFlow.lessons.last().text.contains("Hey Vision"))
     }
 }

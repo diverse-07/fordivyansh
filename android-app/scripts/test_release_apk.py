@@ -71,12 +71,12 @@ class ReleaseTest(unittest.TestCase):
             release_metadata("refs/heads/main", 1, "not-a-commit")
 
     def test_debug_wrong_version_and_missing_network_permission_are_rejected(self):
-        good = "package: name='com.librevision' versionCode='100001' versionName='0.22.0'\nuses-permission: name='android.permission.INTERNET'\n"
+        good = "package: name='com.netrasaathi' versionCode='100001' versionName='0.22.0'\nuses-permission: name='android.permission.INTERNET'\n"
         verify_badging(good, 100001, "0.22.0")
         for text in [
             good + "application-debuggable\n",
             good.replace("100001", "21"),
-            good.replace("com.librevision", "another.app"),
+            good.replace("com.netrasaathi", "another.app"),
             good.split("\n")[0],
         ]:
             with self.subTest(text=text), self.assertRaises(ValueError):
@@ -112,7 +112,7 @@ class ReleaseTest(unittest.TestCase):
             output = root / "release"
             meta = release_metadata("refs/heads/main", 1, SHA)
             stage_release(apk, output, meta, URL, SHA, root)
-            with zipfile.ZipFile(output / "LibreVision-notices.zip") as archive:
+            with zipfile.ZipFile(output / "NetraSaathi-notices.zip") as archive:
                 self.assertIn("NOTICE", archive.namelist())
                 self.assertIn("LICENSE", archive.namelist())
                 self.assertNotIn("app/src/main/assets/model.onnx", archive.namelist())

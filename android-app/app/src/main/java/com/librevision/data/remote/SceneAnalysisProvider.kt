@@ -40,11 +40,11 @@ interface SceneAnalysisProvider {
     suspend fun analyze(request: SceneRequest): Result<SceneResponse>
 }
 
-/** No HTTP or fabricated Meta responses until the gateway contract is verified. */
+/** No HTTP or fabricated provider responses until the gateway contract is verified. */
 class UnconfiguredSceneAnalysisProvider : SceneAnalysisProvider {
     override val unavailableReason =
-        "Meta gateway is not configured. No image was captured or sent."
+        "Cloud AI gateway is not configured. No image was captured or sent."
 
     override suspend fun analyze(request: SceneRequest): Result<SceneResponse> =
-        Result.failure(IllegalStateException("Meta gateway is not configured. No image was sent."))
+        Result.failure(IllegalStateException("Cloud AI gateway is not configured. No image was sent."))
 }
